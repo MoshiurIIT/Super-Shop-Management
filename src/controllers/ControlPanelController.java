@@ -5,26 +5,43 @@ import views.ProductsPanel;
 import views.PurchasesPanel;
 
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 
-public class ControlPanelController {
+public class ControlPanelController implements MenuListener {
+
+    private ControlPanel controlPanel;
 
     ProductsPanel productsPanel = new ProductsPanel();
     PurchasesPanel purchasesPanel = new PurchasesPanel();
 
-    public ControlPanelController() {
+    public ControlPanelController(ControlPanel panel) {
+        controlPanel = panel;
+    }
+
+    @Override
+    public void menuSelected(MenuEvent event) {
+        String selectedMenu = ((JMenuItem)event.getSource()).getActionCommand();
+        switch (selectedMenu){
+            case "Products":
+                controlPanel.setContentPane(productsPanel);
+                break;
+            case "Purchases":
+                controlPanel.setContentPane(purchasesPanel);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void menuDeselected(MenuEvent e) {
 
     }
 
-    public void clickListener(ControlPanel controlPanel, ActionEvent event) {
-
-        if(event.getActionCommand() == "Purchases"){
-            controlPanel.setContentPane(purchasesPanel);
-        }
-        else {
-            controlPanel.setContentPane(productsPanel);
-        }
+    @Override
+    public void menuCanceled(MenuEvent e) {
 
     }
-
 }
