@@ -11,14 +11,15 @@ public class ControlPanel extends JFrame {
 
     private ControlPanel self = this;
 
-    private ControlPanelController controlPanelController = new ControlPanelController();
+    private ControlPanelController controlPanelController = new ControlPanelController(self);
 
     public ControlPanel() {
         super("Control Panel");
-        setVisible(true);
-        setBounds(new Rectangle(700, 700));
 
         init();
+
+        setBounds(new Rectangle(700, 700));
+        setVisible(true);
     }
 
     public JMenu getHelpMenu() {
@@ -44,42 +45,32 @@ public class ControlPanel extends JFrame {
 
         JMenuBar menubar = new JMenuBar();
 
-        JMenuItem products = getProductsMenuItem();
+        JMenu products = getProductsMenu();
         menubar.add(products);
 
-        JMenuItem purchases = getPurchasesMenuItem();
+        JMenu purchases = getPurchasesMenu();
         menubar.add(purchases);
 
-        //JMenu helpMenu = getHelpMenu();
-        //menubar.add(helpMenu);
+        JMenu helpMenu = getHelpMenu();
+        menubar.add(helpMenu);
 
         return menubar;
 
     }
 
-    public JMenuItem getProductsMenuItem() {
+    public JMenu getProductsMenu() {
 
-        JMenuItem products = new JMenuItem("Products");
-        products.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                controlPanelController.clickListener(self, event);
-            }
-        });
+        JMenu products = new JMenu("Products");
+        products.addMenuListener(controlPanelController);
 
         return products;
 
     }
 
-    public JMenuItem getPurchasesMenuItem() {
+    public JMenu getPurchasesMenu() {
 
-        JMenuItem purchases = new JMenuItem("Purchases");
-        purchases.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                controlPanelController.clickListener(self, event);
-            }
-        });
+        JMenu purchases = new JMenu("Purchases");
+        purchases.addMenuListener(controlPanelController);
 
         return purchases;
 
