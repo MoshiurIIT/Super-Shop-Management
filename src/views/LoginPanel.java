@@ -28,7 +28,6 @@ public class LoginPanel extends JFrame {
 
         setLayout(null);
         setVisible(true);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public JPanel getContentPanel() {
@@ -109,7 +108,11 @@ public class LoginPanel extends JFrame {
                 String password = new String(passwordField.getPassword());
 
                 Boolean authenticated = Authentication.authenticate(userType,userName, password);
-                if(authenticated) JOptionPane.showMessageDialog(null,"Authentication Successful");
+                if(authenticated){
+                    self.dispose();
+                    new ControlPanel();
+                    JOptionPane.showMessageDialog(null,"Authentication Successful");
+                }
                 else JOptionPane.showMessageDialog(null,"Try Again");
             }
         });

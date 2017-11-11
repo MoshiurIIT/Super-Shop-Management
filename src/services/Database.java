@@ -1,7 +1,12 @@
 package services;
 
+import net.proteanit.sql.DbUtils;
+
+import javax.swing.table.TableModel;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 public class Database {
 
@@ -12,8 +17,7 @@ public class Database {
         return true;
     }
 
-    public static Boolean connect ()
-    {
+    public static Boolean connect () {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:EmployeeData.sqlite");
@@ -22,6 +26,21 @@ public class Database {
         }catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public static TableModel getProducts() {
+
+        if(!checkConnection()) return null;
+
+        try {
+            String query = "select * from Product";
+            PreparedStatement pst = connection.prepareStatement(query);
+            ResultSet rs = pst.executeQuery();
+            return DbUtils.resultSetToTableModel(rs);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

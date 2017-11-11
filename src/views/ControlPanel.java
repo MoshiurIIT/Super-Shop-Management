@@ -18,16 +18,14 @@ public class ControlPanel extends JFrame {
 
         init();
 
-        setBounds(new Rectangle(700, 700));
+        setBounds(new Rectangle(800, 700));
         setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public JMenu getAccountMenu() {
 
         JMenu accountMenu = new JMenu("Account");
-
-        JMenu loginMenu = getLoginMenu();
-        accountMenu.add(loginMenu);
 
         return accountMenu;
 
@@ -49,20 +47,6 @@ public class ControlPanel extends JFrame {
         helpMenu.add(manualHelpMenuItem);
 
         return helpMenu;
-
-    }
-
-    public JMenu getLoginMenu() {
-
-        JMenu loginMenu = new JMenu("Login As");
-
-        JMenuItem adminMenuItem = getAdminMenuItem();
-        loginMenu.add(adminMenuItem);
-
-        JMenuItem salesStaffMenuItem = getSalesStaffMenuItem();
-        loginMenu.add(salesStaffMenuItem);
-
-        return loginMenu;
 
     }
 
@@ -112,17 +96,11 @@ public class ControlPanel extends JFrame {
 
     }
 
-    public JMenuItem getSalesStaffMenuItem() {
-
-        JMenuItem salesStaffMenuItem = new JMenuItem("Sales Staff");
-
-        return salesStaffMenuItem;
-
-    }
-
     public void init() {
         JMenuBar menubar = getMenubar();
         setJMenuBar(menubar);
+
+        controlPanelController.loadProductsPanel();
     }
 
 }

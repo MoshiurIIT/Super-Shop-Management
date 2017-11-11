@@ -20,15 +20,23 @@ public class ControlPanelController implements MenuListener {
         controlPanel = panel;
     }
 
+    public void loadProductsPanel() {
+        controlPanel.setContentPane(productsPanel);
+    }
+
+    public void loadPurchasesPanel() {
+        controlPanel.setContentPane(purchasesPanel);
+    }
+
     @Override
     public void menuSelected(MenuEvent event) {
         String selectedMenu = ((JMenuItem)event.getSource()).getActionCommand();
         switch (selectedMenu){
             case "Products":
-                controlPanel.setContentPane(productsPanel);
+                loadProductsPanel();
                 break;
             case "Purchases":
-                controlPanel.setContentPane(purchasesPanel);
+                loadPurchasesPanel();
                 break;
             default:
                 break;
