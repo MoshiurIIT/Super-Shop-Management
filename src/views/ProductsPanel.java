@@ -62,13 +62,7 @@ public class ProductsPanel extends JPanel {
         btnAddProduct.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                Product product = new Product();
-
-                product.p_id = textField_id.getText();
-                product.p_name = textField_name.getText();
-                product.p_catagory = textField_category.getText();
-                product.p_price = textField_price.getText();
-                product.p_unit = textField_unit.getText();
+                Product product = getProduct();
 
                 Boolean isAdded = Database.addProduct(product);
                 if(isAdded){
@@ -80,6 +74,42 @@ public class ProductsPanel extends JPanel {
             }
         });
         add(btnAddProduct);
+
+        JButton btnUpdateProduct = new JButton("Update");
+        btnUpdateProduct.setBounds(100, 318, 88, 44);
+        btnUpdateProduct.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                Product product = getProduct();
+
+                Boolean isAdded = Database.updateProduct(product);
+                if(isAdded){
+                    JOptionPane.showMessageDialog(null, "Data Updated");
+                    TableModel products = Database.get("Product");
+                    if(products != null) productsTable.setModel(products);
+                }
+                else JOptionPane.showMessageDialog(null, "Error");
+            }
+        });
+        add(btnUpdateProduct);
+
+        JButton btnDeleteProduct = new JButton("Delete");
+        btnDeleteProduct.setBounds(200, 318, 88, 44);
+        btnDeleteProduct.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                Product product = getProduct();
+
+                Boolean isAdded = Database.deleteProduct(product);
+                if(isAdded){
+                    JOptionPane.showMessageDialog(null, "Data Deleted");
+                    TableModel products = Database.get("Product");
+                    if(products != null) productsTable.setModel(products);
+                }
+                else JOptionPane.showMessageDialog(null, "Error");
+            }
+        });
+        add(btnDeleteProduct);
     }
 
     public JDesktopPane getProductPane() {
@@ -184,6 +214,18 @@ public class ProductsPanel extends JPanel {
 
         add(txtSearchProducts);
 
+    }
+
+    public Product getProduct() {
+        Product product = new Product();
+
+        product.p_id = textField_id.getText();
+        product.p_name = textField_name.getText();
+        product.p_catagory = textField_category.getText();
+        product.p_price = textField_price.getText();
+        product.p_unit = textField_unit.getText();
+
+        return product;
     }
 
 }

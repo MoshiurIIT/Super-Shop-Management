@@ -1,5 +1,7 @@
 package services;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,17 +33,41 @@ public class QueryExecutor {
         }
     }
 
-    public static ResultSet executeQuery(String query) {
+    public static ResultSet executeQuery(String query, String[] prop) {
 
         if(!checkConnection()) return null;
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            for (int i = 0; i < prop.length; i++) {
+                preparedStatement.setString(i + 1, prop[i]);
+            }
+
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSet;
         } catch (Exception exception) {
             exception.printStackTrace();
             return null;
+        }
+    }
+
+    public static Boolean execute(String query, String[] prop) {
+
+        if(!checkConnection()) return false;
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+            for (int i = 0; i < prop.length; i++) {
+                preparedStatement.setString(i + 1, prop[i]);
+            }
+
+            preparedStatement.execute();
+            return true;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return false;
         }
     }
 

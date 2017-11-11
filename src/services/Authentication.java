@@ -15,7 +15,7 @@ public class Authentication {
 
             String query = "select * from " + tableName + " where Username=" + username + " and Password=" + password;
 
-            ResultSet resultSet = QueryExecutor.executeQuery(query);
+            ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{});
             int count = 0;
             while (resultSet.next()) {
                 count = count+1;
