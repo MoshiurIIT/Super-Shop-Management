@@ -1,12 +1,24 @@
 package views;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import services.Authentication;
+import sun.security.util.Password;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
 public class LoginPanel extends JFrame {
+
+    private LoginPanel self = this;
+
+    private JComboBox userSelectionBox;
+    private JTextField userNameField;
+    private JPasswordField passwordField;
 
     public LoginPanel() {
         super("Log in");
@@ -36,7 +48,7 @@ public class LoginPanel extends JFrame {
         userTypeLabel.setBounds(150, 200, 100, 30);
         contentPanel.add(userTypeLabel);
 
-        JComboBox userSelectionBox = getUserSelectionBox();
+        userSelectionBox = getUserSelectionBox();
         userSelectionBox.setBounds(250, 200, 200, 30);
         contentPanel.add(userSelectionBox);
 
@@ -44,7 +56,7 @@ public class LoginPanel extends JFrame {
         userNameLabel.setBounds(150, 250, 100, 30);
         contentPanel.add(userNameLabel);
 
-        JTextField userNameField = getUserNameField();
+        userNameField = getUserNameField();
         userNameField.setBounds(250, 250, 200, 30);
         contentPanel.add(userNameField);
 
@@ -52,7 +64,7 @@ public class LoginPanel extends JFrame {
         passwordLabel.setBounds(150, 300, 100, 30);
         contentPanel.add(passwordLabel);
 
-        JPasswordField passwordField = getPasswordField();
+        passwordField = getPasswordField();
         passwordField.setBounds(250, 300, 200, 30);
         contentPanel.add(passwordField);
 
@@ -88,6 +100,19 @@ public class LoginPanel extends JFrame {
         JButton submitButton = new JButton("Log In");
 
         submitButton.setBounds(300, 400, 100, 30);
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String userType = userSelectionBox.getSelectedItem().toString();
+                String userName = userNameField.getText();
+                String password = new String(passwordField.getPassword());
+
+                Boolean authenticated = Authentication.authenticate(userType,userName, password);
+                if(authenticated) JOptionPane.showMessageDialog(null,"Authentication Successful");
+                else JOptionPane.showMessageDialog(null,"Try Again");
+            }
+        });
 
         return submitButton;
 
