@@ -5,10 +5,18 @@ import services.Database;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.*;
+import java.awt.event.*;
 
 public class ProductsPanel extends JPanel {
 
-    JTable productsTable = new JTable();
+    private JTable productsTable = new JTable();
+    private JTextField textField_id;
+    private JTextField textField_name;
+    private JTextField textField_category;
+    private JTextField textField_price;
+    private JTextField textField_unit;
+    private JComboBox comboBox;
+    private JTextField txtSearchProducts;
 
     public ProductsPanel() {
         setBackground(Color.WHITE);
@@ -20,40 +28,62 @@ public class ProductsPanel extends JPanel {
 
     public void init() {
 
-        JDesktopPane desktopPane = getProductPane();
-        add(desktopPane);
+        JDesktopPane productPane = getProductPane();
+        add(productPane);
 
         JDesktopPane productsPane = getProductsPen();
         add(productsPane);
+
+        addSearchOption();
+
+        textField_id = new JTextField();
+        textField_id.setBounds(120, 127, 120, 20);
+        add(textField_id);
+
+        textField_name = new JTextField();
+        textField_name.setBounds(120, 159, 120, 20);
+        add(textField_name);
+
+        textField_category = new JTextField();
+        textField_category.setBounds(120, 193, 120, 20);
+        add(textField_category);
+
+        textField_price = new JTextField();
+        textField_price.setBounds(120, 227, 120, 20);
+        add(textField_price);
+
+        textField_unit = new JTextField();
+        textField_unit.setBounds(120, 261, 120, 20);
+        add(textField_unit);
     }
 
     public JDesktopPane getProductPane() {
 
-        JDesktopPane desktopPane = new JDesktopPane();
-        desktopPane.setBorder(BorderFactory.createTitledBorder("Product Data"));
-        desktopPane.setBounds(3, 97, 286, 210);
+        JDesktopPane productPane = new JDesktopPane();
+        productPane.setBorder(BorderFactory.createTitledBorder("Product Data"));
+        productPane.setBounds(3, 97, 286, 210);
 
         JLabel lblProductId = new JLabel("Product ID");
         lblProductId.setBounds(10, 26, 80, 24);
-        desktopPane.add(lblProductId);
+        productPane.add(lblProductId);
 
         JLabel lblProductName = new JLabel("Name");
         lblProductName.setBounds(10, 52, 42, 30);
-        desktopPane.add(lblProductName);
+        productPane.add(lblProductName);
 
         JLabel lblProductCatagory = new JLabel("Catagory");
         lblProductCatagory.setBounds(10, 90, 107, 29);
-        desktopPane.add(lblProductCatagory);
+        productPane.add(lblProductCatagory);
 
         JLabel lblProductPrice = new JLabel("Price");
         lblProductPrice.setBounds(10, 125, 107, 29);
-        desktopPane.add(lblProductPrice);
+        productPane.add(lblProductPrice);
 
         JLabel lblUnit = new JLabel("Unit");
         lblUnit.setBounds(10, 160, 107, 29);
-        desktopPane.add(lblUnit);
+        productPane.add(lblUnit);
 
-        return desktopPane;
+        return productPane;
     }
 
     public JDesktopPane getProductsPen() {
@@ -65,6 +95,23 @@ public class ProductsPanel extends JPanel {
         TableModel products = Database.getProducts();
         if(products != null) productsTable.setModel(products);
 
+        productsTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = productsTable.getSelectedRow();
+                TableModel tableModel = productsTable.getModel();
+                String data[] = new String[5];
+                for (int i = 0; i < 5; i++) {
+                    data[i] = tableModel.getValueAt(row, i).toString();
+                }
+                textField_id.setText(data[0]);
+                textField_name.setText(data[1]);
+                textField_category.setText(data[2]);
+                textField_price.setText(data[3]);
+                textField_unit.setText(data[4]);
+            }
+        });
+
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(20, 20, 440, 480);
         scrollPane.setViewportView(productsTable);
@@ -73,6 +120,45 @@ public class ProductsPanel extends JPanel {
         productsPen.setBounds(300, 100, 470, 500);
 
         return productsPen;
+    }
+
+    public void addSearchOption() {
+
+        JLabel searchKeyLabel = new JLabel("Search Key");
+        searchKeyLabel.setBounds(350, 10, 100, 30);
+        add(searchKeyLabel);
+
+        comboBox = new JComboBox<String>(new String[] {"p_id", "p_name", "p_catagory"});
+        comboBox.setBounds(500, 10, 200, 30);
+        add(comboBox);
+
+        JLabel searchTextLabel = new JLabel("Search Text");
+        searchTextLabel.setBounds(350, 50, 100, 30);
+        add(searchTextLabel);
+
+        txtSearchProducts = new JTextField();
+        txtSearchProducts.setBounds(500, 50, 200, 30);
+        txtSearchProducts.setToolTipText("Search Products");
+
+        txtSearchProducts.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent event) {
+                String searchKey = (String) comboBox.getSelectedItem();
+                String searchText = txtSearchProducts.getText();
+
+                if(searchText.isEmpty()) {
+                    TableModel products = Database.getProducts();
+                    if(products != null) productsTable.setModel(products);
+                }
+                else {
+                    TableModel products = Database.getProducts(searchKey, searchText);
+                    if(products != null) productsTable.setModel(products);
+                }
+            }
+        });
+
+        add(txtSearchProducts);
+
     }
 
 }
