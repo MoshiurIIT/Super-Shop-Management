@@ -14,6 +14,11 @@ public class QueryExecutor {
         return true;
     }
 
+    public static Connection getConnection() {
+        if(!checkConnection()) return null;
+        return connection;
+    }
+
     public static Boolean connect () {
         try {
             Class.forName("org.sqlite.JDBC");

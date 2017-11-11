@@ -1,5 +1,6 @@
 package views;
 
+import models.Product;
 import services.Database;
 
 import javax.swing.*;
@@ -55,6 +56,30 @@ public class ProductsPanel extends JPanel {
         textField_unit = new JTextField();
         textField_unit.setBounds(120, 261, 120, 20);
         add(textField_unit);
+
+        JButton btnAddProduct = new JButton("Add");
+        btnAddProduct.setBounds(5, 318, 88, 44);
+        btnAddProduct.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                Product product = new Product();
+
+                product.p_id = textField_id.getText();
+                product.p_name = textField_name.getText();
+                product.p_catagory = textField_category.getText();
+                product.p_price = textField_price.getText();
+                product.p_unit = textField_unit.getText();
+
+                Boolean isAdded = Database.addProduct(product);
+                if(isAdded){
+                    JOptionPane.showMessageDialog(null, "Data Added");
+                    TableModel products = Database.get("Product");
+                    if(products != null) productsTable.setModel(products);
+                }
+                else JOptionPane.showMessageDialog(null, "Error");
+            }
+        });
+        add(btnAddProduct);
     }
 
     public JDesktopPane getProductPane() {
@@ -92,7 +117,7 @@ public class ProductsPanel extends JPanel {
 
         productsPen.setBorder(BorderFactory.createTitledBorder("Products Table"));
 
-        TableModel products = Database.getProducts();
+        TableModel products = Database.get("Product");
         if(products != null) productsTable.setModel(products);
 
         productsTable.addMouseListener(new MouseAdapter() {
@@ -147,11 +172,11 @@ public class ProductsPanel extends JPanel {
                 String searchText = txtSearchProducts.getText();
 
                 if(searchText.isEmpty()) {
-                    TableModel products = Database.getProducts();
+                    TableModel products = Database.get("Product");
                     if(products != null) productsTable.setModel(products);
                 }
                 else {
-                    TableModel products = Database.getProducts(searchKey, searchText);
+                    TableModel products = Database.get("Product", searchKey, searchText);
                     if(products != null) productsTable.setModel(products);
                 }
             }
