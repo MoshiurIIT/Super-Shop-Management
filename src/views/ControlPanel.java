@@ -22,6 +22,25 @@ public class ControlPanel extends JFrame {
         setVisible(true);
     }
 
+    public JMenu getAccountMenu() {
+
+        JMenu accountMenu = new JMenu("Account");
+
+        JMenu loginMenu = getLoginMenu();
+        accountMenu.add(loginMenu);
+
+        return accountMenu;
+
+    }
+
+    public JMenuItem getAdminMenuItem() {
+
+        JMenuItem adminMenuItem = new JMenuItem("Admin");
+
+        return adminMenuItem;
+
+    }
+
     public JMenu getHelpMenu() {
 
         JMenu helpMenu = new JMenu("Help");
@@ -30,6 +49,20 @@ public class ControlPanel extends JFrame {
         helpMenu.add(manualHelpMenuItem);
 
         return helpMenu;
+
+    }
+
+    public JMenu getLoginMenu() {
+
+        JMenu loginMenu = new JMenu("Login As");
+
+        JMenuItem adminMenuItem = getAdminMenuItem();
+        loginMenu.add(adminMenuItem);
+
+        JMenuItem salesStaffMenuItem = getSalesStaffMenuItem();
+        loginMenu.add(salesStaffMenuItem);
+
+        return loginMenu;
 
     }
 
@@ -50,6 +83,9 @@ public class ControlPanel extends JFrame {
 
         JMenu purchases = getPurchasesMenu();
         menubar.add(purchases);
+
+        JMenu accountMenu = getAccountMenu();
+        menubar.add(accountMenu);
 
         JMenu helpMenu = getHelpMenu();
         menubar.add(helpMenu);
@@ -73,6 +109,14 @@ public class ControlPanel extends JFrame {
         purchases.addMenuListener(controlPanelController);
 
         return purchases;
+
+    }
+
+    public JMenuItem getSalesStaffMenuItem() {
+
+        JMenuItem salesStaffMenuItem = new JMenuItem("Sales Staff");
+
+        return salesStaffMenuItem;
 
     }
 
