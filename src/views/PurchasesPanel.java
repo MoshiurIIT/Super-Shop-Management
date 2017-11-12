@@ -1,23 +1,35 @@
 package views;
 
-import models.Product;
+import models.Purchase;
+import org.jdatepicker.impl.JDatePanelImpl;
+import org.jdatepicker.impl.JDatePickerImpl;
+import org.jdatepicker.impl.UtilDateModel;
 import services.Database;
+import utilities.DateLabelFormatter;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Properties;
 
 public class PurchasesPanel extends JPanel {
 
     private JTable productsTable = new JTable();
-    private JTextField textField_id;
-    private JTextField textField_name;
-    private JTextField textField_category;
-    private JTextField textField_price;
-    private JTextField textField_unit;
+    private JTextField textField_pid;
+    private JTextField textField_cid;
+    private JDatePickerImpl jDatePicker;
     private JComboBox comboBox;
     private JTextField txtSearchProducts;
+
+    private JTable cartTable = new JTable();
+    JLabel totalCostLabel;
+
+    private ArrayList<Purchase> cartList = new ArrayList<Purchase>();
+    private int bill_id = Database.getMaxColumnValue("BillPay", "b_id") + 1;
 
     public PurchasesPanel() {
         setBackground(Color.WHITE);
@@ -32,111 +44,93 @@ public class PurchasesPanel extends JPanel {
         JDesktopPane purchasePane = getPurchasePane();
         add(purchasePane);
 
-        JDesktopPane purchasesPane = getProductsPen();
-        add(purchasesPane);
+        JDesktopPane productsPen = getProductsPen();
+        add(productsPen);
 
         addSearchOption();
 
-        textField_id = new JTextField();
-        textField_id.setBounds(120, 127, 120, 20);
-        add(textField_id);
+        textField_pid = new JTextField();
+        textField_pid.setBounds(120, 127, 120, 20);
+        add(textField_pid);
 
-        textField_name = new JTextField();
-        textField_name.setBounds(120, 159, 120, 20);
-        add(textField_name);
+        textField_cid = new JTextField();
+        textField_cid.setBounds(120, 159, 120, 20);
+        add(textField_cid);
 
-        textField_category = new JTextField();
-        textField_category.setBounds(120, 193, 120, 20);
-        add(textField_category);
+        Properties properties = new Properties();
+        properties.put("text.today", "Today");
+        properties.put("text.month", "Month");
+        properties.put("text.year", "Year");
 
-        textField_price = new JTextField();
-        textField_price.setBounds(120, 227, 120, 20);
-        add(textField_price);
+        jDatePicker = new JDatePickerImpl(new JDatePanelImpl(new UtilDateModel(), properties), new DateLabelFormatter());
+        jDatePicker.setBounds(120, 193, 140, 30);
+        add(jDatePicker);
 
-        textField_unit = new JTextField();
-        textField_unit.setBounds(120, 261, 120, 20);
-        add(textField_unit);
-
-        JButton btnAddProduct = new JButton("Add");
-        btnAddProduct.setBounds(5, 318, 88, 44);
-        btnAddProduct.addActionListener(new ActionListener() {
+        JButton btnAddToCart = new JButton("Add To Cart");
+        btnAddToCart.setBounds(5, 250, 100, 30);
+        btnAddToCart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                Product product = getProduct();
-
-                Boolean isAdded = Database.addProduct(product);
-                if(isAdded){
-                    JOptionPane.showMessageDialog(null, "Data Added");
-                    TableModel products = Database.get("Product");
-                    if(products != null) productsTable.setModel(products);
-                }
-                else JOptionPane.showMessageDialog(null, "Error");
+                Purchase purchase = getPurchase();
+                cartList.add(purchase);
+                updateCartList();
             }
         });
-        add(btnAddProduct);
+        add(btnAddToCart);
 
-        JButton btnUpdateProduct = new JButton("Update");
-        btnUpdateProduct.setBounds(100, 318, 88, 44);
-        btnUpdateProduct.addActionListener(new ActionListener() {
+        totalCostLabel = new JLabel();
+        totalCostLabel.setBounds(10, 550, 200, 30);
+        add(totalCostLabel);
+
+        JDesktopPane cartPane = getCartPen();
+        add(cartPane);
+
+        JButton purchaseBtn = new JButton("Purchase");
+        purchaseBtn.setBounds(10, 590, 100, 30);
+        purchaseBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                Product product = getProduct();
-
-                Boolean isAdded = Database.updateProduct(product);
-                if(isAdded){
-                    JOptionPane.showMessageDialog(null, "Data Updated");
-                    TableModel products = Database.get("Product");
-                    if(products != null) productsTable.setModel(products);
-                }
-                else JOptionPane.showMessageDialog(null, "Error");
+                purchaseAll();
             }
         });
-        add(btnUpdateProduct);
+        add(purchaseBtn);
+    }
 
-        JButton btnDeleteProduct = new JButton("Delete");
-        btnDeleteProduct.setBounds(200, 318, 88, 44);
-        btnDeleteProduct.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                Product product = getProduct();
+    public JDesktopPane getCartPen() {
 
-                Boolean isAdded = Database.deleteProduct(product);
-                if(isAdded){
-                    JOptionPane.showMessageDialog(null, "Data Deleted");
-                    TableModel products = Database.get("Product");
-                    if(products != null) productsTable.setModel(products);
-                }
-                else JOptionPane.showMessageDialog(null, "Error");
-            }
-        });
-        add(btnDeleteProduct);
+        JDesktopPane cartPane = new JDesktopPane();
+
+        cartPane.setBorder(BorderFactory.createTitledBorder("Cart Table"));
+
+        updateCartList();
+
+        JScrollPane scrollPane = new JScrollPane();
+        scrollPane.setBounds(10, 20, 275, 220);
+        scrollPane.setViewportView(cartTable);
+        cartPane.add(scrollPane);
+
+        cartPane.setBounds(5, 300, 295, 250);
+
+        return cartPane;
     }
 
     public JDesktopPane getPurchasePane() {
 
         JDesktopPane purchasePane = new JDesktopPane();
         purchasePane.setBorder(BorderFactory.createTitledBorder("Purchase Data"));
-        purchasePane.setBounds(3, 97, 286, 210);
+        purchasePane.setBounds(3, 97, 286, 150);
 
-        JLabel lblPurchaseId = new JLabel("Purchase ID");
-        lblPurchaseId.setBounds(10, 26, 80, 24);
-        purchasePane.add(lblPurchaseId);
+        JLabel lblProductId = new JLabel("Product ID");
+        lblProductId.setBounds(10, 25, 80, 30);
+        purchasePane.add(lblProductId);
 
-        JLabel lblPurchaseName = new JLabel("Name");
-        lblPurchaseName.setBounds(10, 52, 42, 30);
-        purchasePane.add(lblPurchaseName);
+        JLabel lblCustomerId = new JLabel("Customer ID");
+        lblCustomerId.setBounds(10, 55, 107, 30);
+        purchasePane.add(lblCustomerId);
 
-        JLabel lblProductCatagory = new JLabel("Catagory");
-        lblProductCatagory.setBounds(10, 90, 107, 29);
-        purchasePane.add(lblProductCatagory);
-
-        JLabel lblProductPrice = new JLabel("Price");
-        lblProductPrice.setBounds(10, 125, 107, 29);
-        purchasePane.add(lblProductPrice);
-
-        JLabel lblUnit = new JLabel("Unit");
-        lblUnit.setBounds(10, 160, 107, 29);
-        purchasePane.add(lblUnit);
+        JLabel lblDate = new JLabel("Date");
+        lblDate.setBounds(10, 90, 107, 30);
+        purchasePane.add(lblDate);
 
         return purchasePane;
     }
@@ -154,16 +148,7 @@ public class PurchasesPanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = productsTable.getSelectedRow();
-                TableModel tableModel = productsTable.getModel();
-                String data[] = new String[5];
-                for (int i = 0; i < 5; i++) {
-                    data[i] = tableModel.getValueAt(row, i).toString();
-                }
-                textField_id.setText(data[0]);
-                textField_name.setText(data[1]);
-                textField_category.setText(data[2]);
-                textField_price.setText(data[3]);
-                textField_unit.setText(data[4]);
+                textField_pid.setText(productsTable.getModel().getValueAt(row, 0).toString());
             }
         });
 
@@ -216,16 +201,44 @@ public class PurchasesPanel extends JPanel {
 
     }
 
-    public Product getProduct() {
-        Product product = new Product();
+    public Purchase getPurchase() {
+        Purchase purchase = new Purchase();
 
-        product.p_id = textField_id.getText();
-        product.p_name = textField_name.getText();
-        product.p_catagory = textField_category.getText();
-        product.p_price = textField_price.getText();
-        product.p_unit = textField_unit.getText();
+        try {
+            purchase.b_id = Integer.toString(bill_id);
+            purchase.p_id = textField_pid.getText();
+            purchase.c_id = textField_cid.getText();
+            purchase.date = (new SimpleDateFormat("yyyy-MM-dd")).parse(jDatePicker.getJFormattedTextField().getText());
+        } catch (Exception exception) {
+            return null;
+        }
 
-        return product;
+        return purchase;
+    }
+
+    public void updateCartList() {
+        String col[] = {"b_id","c_id","p_id", "date"};
+        DefaultTableModel tableModel = new DefaultTableModel(col, 0);
+
+        for (Purchase purchase: cartList)
+            tableModel.addRow(purchase.toArray());
+        cartTable.setModel(tableModel);
+
+        totalCostLabel.setText("Total Cost = " + Database.getTotalCost(cartList));
+        setVisible(true);
+    }
+
+    public void purchaseAll() {
+
+        for (Purchase purchase: cartList)
+            if(!Database.addPurchase(purchase)) {
+                JOptionPane.showMessageDialog(null, "Error");
+                return;
+            }
+
+        cartList.clear();
+        JOptionPane.showMessageDialog(null, "Successful");
+        updateCartList();
     }
 
 }

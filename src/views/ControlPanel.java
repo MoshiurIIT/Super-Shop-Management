@@ -31,11 +31,12 @@ public class ControlPanel extends JFrame {
 
     }
 
-    public JMenuItem getAdminMenuItem() {
+    public JMenu getCustomersMenu() {
 
-        JMenuItem adminMenuItem = new JMenuItem("Admin");
+        JMenu customers = new JMenu("Customers");
+        customers.addMenuListener(controlPanelController);
 
-        return adminMenuItem;
+        return customers;
 
     }
 
@@ -67,6 +68,9 @@ public class ControlPanel extends JFrame {
 
         JMenu purchases = getPurchasesMenu();
         menubar.add(purchases);
+
+        JMenu customers = getCustomersMenu();
+        menubar.add(customers);
 
         JMenu accountMenu = getAccountMenu();
         menubar.add(accountMenu);
@@ -100,7 +104,7 @@ public class ControlPanel extends JFrame {
         JMenuBar menubar = getMenubar();
         setJMenuBar(menubar);
 
-        controlPanelController.loadCutomersPanel();
+        controlPanelController.loadPurchasesPanel();
     }
 
 }

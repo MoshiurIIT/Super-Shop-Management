@@ -2,6 +2,7 @@ package controllers;
 
 import views.ControlPanel;
 import views.CustomersPanel;
+import views.ProductsPanel;
 import views.PurchasesPanel;
 
 import javax.swing.*;
@@ -12,7 +13,7 @@ public class ControlPanelController implements MenuListener {
 
     private ControlPanel controlPanel;
 
-    CustomersPanel productsPanel = new CustomersPanel();
+    ProductsPanel productsPanel = new ProductsPanel();
     PurchasesPanel purchasesPanel = new PurchasesPanel();
     CustomersPanel customersPanel = new CustomersPanel();
 
@@ -30,7 +31,7 @@ public class ControlPanelController implements MenuListener {
         controlPanel.setVisible(true);
     }
 
-    public void loadCutomersPanel() {
+    public void loadCustomersPanel() {
         controlPanel.setContentPane(customersPanel);
         controlPanel.setVisible(true);
     }
@@ -45,9 +46,13 @@ public class ControlPanelController implements MenuListener {
             case "Purchases":
                 loadPurchasesPanel();
                 break;
+            case "Customers":
+                loadCustomersPanel();
+                break;
             default:
                 break;
         }
+        controlPanel.setVisible(true);
     }
 
     @Override

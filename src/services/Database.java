@@ -2,10 +2,14 @@ package services;
 
 import models.Customer;
 import models.Product;
+import models.Purchase;
 import net.proteanit.sql.DbUtils;
 
 import javax.swing.table.TableModel;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class Database {
 
@@ -36,8 +40,8 @@ public class Database {
 
     public static Boolean addProduct(Product product) {
         try {
-            String query = "insert into Product (p_id, p_name, p_catagory, p_price, p_unit) values(?, ?, ?, ?, ?)";
-            return QueryExecutor.execute(query, new String[]{product.p_id, product.p_name, product.p_catagory,
+            String query = "insert into Product (p_name, p_catagory, p_price, p_unit) values(?, ?, ?, ?)";
+            return QueryExecutor.execute(query, new String[]{product.p_name, product.p_catagory,
                     product.p_price, product.p_unit});
         } catch (Exception e) {
             e.printStackTrace();
@@ -68,8 +72,8 @@ public class Database {
 
     public static Boolean addCustomer(Customer customer) {
         try {
-            String query = "insert into Customer (c_id, c_name, c_contact, c_address) values(?, ?, ?, ?)";
-            return QueryExecutor.execute(query, new String[]{customer.c_id, customer.c_name, customer.c_contact,
+            String query = "insert into Customer (c_name, c_contact, c_address) values(?, ?, ?)";
+            return QueryExecutor.execute(query, new String[]{customer.c_name, customer.c_contact,
                     customer.c_address});
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,6 +99,74 @@ public class Database {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public static Boolean addPurchase(Purchase purchase) {
+        try {
+            String query = "insert into BillPay (b_id, c_id, p_id, date) values(?, ?, ?, ?)";
+            return QueryExecutor.execute(query, new String[]{purchase.b_id, purchase.c_id,
+                    purchase.p_id, new SimpleDateFormat("yyyy-MM-dd").format(purchase.date)});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean updatePurchase(Purchase purchase) {
+        try {
+            String query = "update BillPay set b_id=?, c_id=?, p_id=?, date=? where id=?";
+            return QueryExecutor.execute(query, new String[]{purchase.b_id, purchase.c_id, purchase.p_id,
+                    purchase.date.toString(), purchase.id});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean deletePurchase(Purchase purchase) {
+        try {
+            String query = "delete from BillPay where id=?";
+            return QueryExecutor.execute(query, new String[]{purchase.id});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static int getMaxColumnValue(String tableName, String columnName) {
+        try {
+            String query = "select * from " + tableName;
+            ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{});
+            int res = 0;
+            while (resultSet.next()) {
+                res = Math.max(res, resultSet.getInt(columnName));
+            }
+            return res;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static double getTotalCost(ArrayList<Purchase> purchases) {
+
+        String purchaseIds[] = new String[purchases.size()];
+        int len = 0;
+        for(Purchase purchase: purchases)
+            purchaseIds[len++] = purchase.p_id;
+
+        try {
+            String commaSeparatedIds = String.join(",", purchaseIds);
+            String query = "select * from Product where p_id in (" + commaSeparatedIds + ")";
+            ResultSet resultSet = QueryExecutor.executeQuery(query, new String[]{});
+
+            double res = 0;
+            while (resultSet.next())
+                res += resultSet.getDouble("p_price");
+            return res;
+        } catch (Exception exception) {
+            return 0;
         }
     }
 }
