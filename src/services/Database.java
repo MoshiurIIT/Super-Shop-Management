@@ -1,5 +1,6 @@
 package services;
 
+import models.Customer;
 import models.Product;
 import net.proteanit.sql.DbUtils;
 
@@ -59,6 +60,38 @@ public class Database {
         try {
             String query = "delete from Product where p_id=?";
             return QueryExecutor.execute(query, new String[]{product.p_id});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean addCustomer(Customer customer) {
+        try {
+            String query = "insert into Customer (c_id, c_name, c_contact, c_address) values(?, ?, ?, ?)";
+            return QueryExecutor.execute(query, new String[]{customer.c_id, customer.c_name, customer.c_contact,
+                    customer.c_address});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean updateCustomer(Customer customer) {
+        try {
+            String query = "update Customer set c_name=?, c_contact=?, c_address=? where c_id=?";
+            return QueryExecutor.execute(query, new String[]{customer.c_name, customer.c_contact, customer.c_address,
+                    customer.c_id});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean deleteCustomer(Customer customer) {
+        try {
+            String query = "delete from Customer where c_id=?";
+            return QueryExecutor.execute(query, new String[]{customer.c_id});
         } catch (Exception e) {
             e.printStackTrace();
             return false;

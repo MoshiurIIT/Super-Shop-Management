@@ -100,7 +100,7 @@ public class ControlPanel extends JFrame {
         JMenuBar menubar = getMenubar();
         setJMenuBar(menubar);
 
-        controlPanelController.loadProductsPanel();
+        controlPanelController.loadCutomersPanel();
     }
 
 }

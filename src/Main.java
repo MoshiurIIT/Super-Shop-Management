@@ -1,5 +1,6 @@
 import views.ControlPanel;
 import views.LoginPanel;
+import views.PurchasesPanel;
 
 public class Main {
 

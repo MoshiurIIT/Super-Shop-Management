@@ -1,20 +1,20 @@
 package controllers;
 
 import views.ControlPanel;
-import views.ProductsPanel;
+import views.CustomersPanel;
 import views.PurchasesPanel;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import java.awt.event.ActionEvent;
 
 public class ControlPanelController implements MenuListener {
 
     private ControlPanel controlPanel;
 
-    ProductsPanel productsPanel = new ProductsPanel();
+    CustomersPanel productsPanel = new CustomersPanel();
     PurchasesPanel purchasesPanel = new PurchasesPanel();
+    CustomersPanel customersPanel = new CustomersPanel();
 
     public ControlPanelController(ControlPanel panel) {
         controlPanel = panel;
@@ -22,10 +22,17 @@ public class ControlPanelController implements MenuListener {
 
     public void loadProductsPanel() {
         controlPanel.setContentPane(productsPanel);
+        controlPanel.setVisible(true);
     }
 
     public void loadPurchasesPanel() {
         controlPanel.setContentPane(purchasesPanel);
+        controlPanel.setVisible(true);
+    }
+
+    public void loadCutomersPanel() {
+        controlPanel.setContentPane(customersPanel);
+        controlPanel.setVisible(true);
     }
 
     @Override
