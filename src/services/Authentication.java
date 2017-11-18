@@ -9,27 +9,18 @@ public class Authentication {
 
     public static Boolean authenticate(String userType, String username, String password) {
 
-        if(!Database.checkConnection()) return false;
-
-        Connection connection = Database.connection;
-
         try {
 
             String tableName = (userType == "Owner") ? "AdminLogin" : "Login";
 
-            String query = "select * from " + tableName + " where Username=? and Password=?";
-            PreparedStatement preparedStatement = connection.prepareStatement (query);
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
+            String query = "select * from " + tableName + " where Username=" + username + " and Password=" + password;
 
-
-            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{});
             int count = 0;
             while (resultSet.next()) {
                 count = count+1;
             }
             resultSet.close();
-            preparedStatement.close();
 
             return count == 1;
 

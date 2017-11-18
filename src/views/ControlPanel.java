@@ -4,40 +4,39 @@ import controllers.ControlPanelController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class ControlPanel extends JFrame {
 
     private ControlPanel self = this;
+    private String userRole;
 
     private ControlPanelController controlPanelController = new ControlPanelController(self);
 
-    public ControlPanel() {
+    public ControlPanel(String _role) {
         super("Control Panel");
+        userRole = _role;
 
         init();
 
-        setBounds(new Rectangle(700, 700));
+        setBounds(new Rectangle(1000, 700));
         setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public JMenu getAccountMenu() {
 
         JMenu accountMenu = new JMenu("Account");
 
-        JMenu loginMenu = getLoginMenu();
-        accountMenu.add(loginMenu);
-
         return accountMenu;
 
     }
 
-    public JMenuItem getAdminMenuItem() {
+    public JMenu getCustomersMenu() {
 
-        JMenuItem adminMenuItem = new JMenuItem("Admin");
+        JMenu customers = new JMenu("Customers");
+        customers.addMenuListener(controlPanelController);
 
-        return adminMenuItem;
+        return customers;
 
     }
 
@@ -49,20 +48,6 @@ public class ControlPanel extends JFrame {
         helpMenu.add(manualHelpMenuItem);
 
         return helpMenu;
-
-    }
-
-    public JMenu getLoginMenu() {
-
-        JMenu loginMenu = new JMenu("Login As");
-
-        JMenuItem adminMenuItem = getAdminMenuItem();
-        loginMenu.add(adminMenuItem);
-
-        JMenuItem salesStaffMenuItem = getSalesStaffMenuItem();
-        loginMenu.add(salesStaffMenuItem);
-
-        return loginMenu;
 
     }
 
@@ -84,14 +69,36 @@ public class ControlPanel extends JFrame {
         JMenu purchases = getPurchasesMenu();
         menubar.add(purchases);
 
+        JMenu customers = getCustomersMenu();
+        menubar.add(customers);
+
         JMenu accountMenu = getAccountMenu();
         menubar.add(accountMenu);
+
+        if(userRole == "Owner") {
+            JMenu usersMenu = getUsersMenu();
+            menubar.add(usersMenu);
+        }
 
         JMenu helpMenu = getHelpMenu();
         menubar.add(helpMenu);
 
         return menubar;
 
+    }
+
+    public JMenu getUsersMenu() {
+        JMenu usersMenu = new JMenu("Users");
+
+        JMenuItem adminMenuItem = new JMenuItem("Owner");
+        adminMenuItem.addActionListener(controlPanelController);
+        usersMenu.add(adminMenuItem);
+
+        JMenuItem salesStaffMenuItem = new JMenuItem("Sales Staff");
+        salesStaffMenuItem.addActionListener(controlPanelController);
+        usersMenu.add(salesStaffMenuItem);
+
+        return usersMenu;
     }
 
     public JMenu getProductsMenu() {
@@ -112,17 +119,11 @@ public class ControlPanel extends JFrame {
 
     }
 
-    public JMenuItem getSalesStaffMenuItem() {
-
-        JMenuItem salesStaffMenuItem = new JMenuItem("Sales Staff");
-
-        return salesStaffMenuItem;
-
-    }
-
     public void init() {
         JMenuBar menubar = getMenubar();
         setJMenuBar(menubar);
+
+        controlPanelController.loadPurchasesPanel();
     }
 
 }
