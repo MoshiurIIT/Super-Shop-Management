@@ -16,15 +16,24 @@ public class ProductsPanel extends JPanel {
     private JTextField textField_category;
     private JTextField textField_price;
     private JTextField textField_unit;
+    private JTextField textField_count;
+    private JTextField textField_barcode;
+
     private JComboBox comboBox;
     private JTextField txtSearchProducts;
+    TableModel products;
 
     public ProductsPanel() {
         setBackground(Color.WHITE);
-        setBounds(0, 0, 700, 700);
+        setBounds(0, 0, 1000, 700);
         setLayout(null);
 
         init();
+    }
+
+    public void loadProducts() {
+        TableModel products = Database.get("Product");
+        if(products != null) productsTable.setModel(products);
     }
 
     public void init() {
@@ -57,8 +66,16 @@ public class ProductsPanel extends JPanel {
         textField_unit.setBounds(120, 261, 120, 20);
         add(textField_unit);
 
+        textField_count = new JTextField();
+        textField_count.setBounds(120, 295, 120, 20);
+        add(textField_count);
+
+        textField_barcode = new JTextField();
+        textField_barcode.setBounds(120, 330, 120, 20);
+        add(textField_barcode);
+
         JButton btnAddProduct = new JButton("Add");
-        btnAddProduct.setBounds(5, 318, 88, 44);
+        btnAddProduct.setBounds(5, 388, 88, 44);
         btnAddProduct.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -76,7 +93,7 @@ public class ProductsPanel extends JPanel {
         add(btnAddProduct);
 
         JButton btnUpdateProduct = new JButton("Update");
-        btnUpdateProduct.setBounds(100, 318, 88, 44);
+        btnUpdateProduct.setBounds(100, 388, 88, 44);
         btnUpdateProduct.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -94,7 +111,7 @@ public class ProductsPanel extends JPanel {
         add(btnUpdateProduct);
 
         JButton btnDeleteProduct = new JButton("Delete");
-        btnDeleteProduct.setBounds(200, 318, 88, 44);
+        btnDeleteProduct.setBounds(200, 388, 88, 44);
         btnDeleteProduct.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -116,7 +133,7 @@ public class ProductsPanel extends JPanel {
 
         JDesktopPane productPane = new JDesktopPane();
         productPane.setBorder(BorderFactory.createTitledBorder("Product Data"));
-        productPane.setBounds(3, 97, 286, 210);
+        productPane.setBounds(3, 97, 286, 280);
 
         JLabel lblProductId = new JLabel("Product ID");
         lblProductId.setBounds(10, 26, 80, 24);
@@ -138,6 +155,14 @@ public class ProductsPanel extends JPanel {
         lblUnit.setBounds(10, 160, 107, 29);
         productPane.add(lblUnit);
 
+        JLabel lblCount = new JLabel("Count");
+        lblCount.setBounds(10, 195, 107, 29);
+        productPane.add(lblCount);
+
+        JLabel lblBarcode = new JLabel("Barcode");
+        lblBarcode.setBounds(10, 230, 107, 29);
+        productPane.add(lblBarcode);
+
         return productPane;
     }
 
@@ -147,16 +172,15 @@ public class ProductsPanel extends JPanel {
 
         productsPen.setBorder(BorderFactory.createTitledBorder("Products Table"));
 
-        TableModel products = Database.get("Product");
-        if(products != null) productsTable.setModel(products);
+        loadProducts();
 
         productsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int row = productsTable.getSelectedRow();
                 TableModel tableModel = productsTable.getModel();
-                String data[] = new String[5];
-                for (int i = 0; i < 5; i++) {
+                String data[] = new String[7];
+                for (int i = 0; i < 7; i++) {
                     data[i] = tableModel.getValueAt(row, i).toString();
                 }
                 textField_id.setText(data[0]);
@@ -164,15 +188,17 @@ public class ProductsPanel extends JPanel {
                 textField_category.setText(data[2]);
                 textField_price.setText(data[3]);
                 textField_unit.setText(data[4]);
+                textField_count.setText(data[5]);
+                textField_barcode.setText(data[6]);
             }
         });
 
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(20, 20, 440, 480);
+        scrollPane.setBounds(20, 20, 640, 480);
         scrollPane.setViewportView(productsTable);
         productsPen.add(scrollPane);
 
-        productsPen.setBounds(300, 100, 470, 500);
+        productsPen.setBounds(300, 100, 670, 500);
 
         return productsPen;
     }
@@ -183,7 +209,7 @@ public class ProductsPanel extends JPanel {
         searchKeyLabel.setBounds(350, 10, 100, 30);
         add(searchKeyLabel);
 
-        comboBox = new JComboBox<String>(new String[] {"p_id", "p_name", "p_catagory"});
+        comboBox = new JComboBox<String>(new String[] {"p_id", "p_name", "p_catagory", "barcode"});
         comboBox.setBounds(500, 10, 200, 30);
         add(comboBox);
 
@@ -224,6 +250,8 @@ public class ProductsPanel extends JPanel {
         product.p_catagory = textField_category.getText();
         product.p_price = textField_price.getText();
         product.p_unit = textField_unit.getText();
+        product.p_count = textField_count.getText();
+        product.barcode = textField_barcode.getText();
 
         return product;
     }

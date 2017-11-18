@@ -4,21 +4,21 @@ import controllers.ControlPanelController;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class ControlPanel extends JFrame {
 
     private ControlPanel self = this;
+    private String userRole;
 
     private ControlPanelController controlPanelController = new ControlPanelController(self);
 
-    public ControlPanel() {
+    public ControlPanel(String _role) {
         super("Control Panel");
+        userRole = _role;
 
         init();
 
-        setBounds(new Rectangle(800, 700));
+        setBounds(new Rectangle(1000, 700));
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
@@ -75,11 +75,30 @@ public class ControlPanel extends JFrame {
         JMenu accountMenu = getAccountMenu();
         menubar.add(accountMenu);
 
+        if(userRole == "Owner") {
+            JMenu usersMenu = getUsersMenu();
+            menubar.add(usersMenu);
+        }
+
         JMenu helpMenu = getHelpMenu();
         menubar.add(helpMenu);
 
         return menubar;
 
+    }
+
+    public JMenu getUsersMenu() {
+        JMenu usersMenu = new JMenu("Users");
+
+        JMenuItem adminMenuItem = new JMenuItem("Owner");
+        adminMenuItem.addActionListener(controlPanelController);
+        usersMenu.add(adminMenuItem);
+
+        JMenuItem salesStaffMenuItem = new JMenuItem("Sales Staff");
+        salesStaffMenuItem.addActionListener(controlPanelController);
+        usersMenu.add(salesStaffMenuItem);
+
+        return usersMenu;
     }
 
     public JMenu getProductsMenu() {

@@ -8,7 +8,7 @@ public class Main {
 
         //LoginPanel loginPanel = new LoginPanel();
 
-        new ControlPanel();
+        new ControlPanel("Owner");
     }
 
 }

@@ -1,11 +1,13 @@
 package views;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import models.Purchase;
 import org.jdatepicker.impl.JDatePanelImpl;
 import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import services.Database;
 import utilities.DateLabelFormatter;
+import utilities.Util;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -24,19 +26,26 @@ public class PurchasesPanel extends JPanel {
     private JDatePickerImpl jDatePicker;
     private JComboBox comboBox;
     private JTextField txtSearchProducts;
+    InvoicePanel invoicePanel = new InvoicePanel();
 
     private JTable cartTable = new JTable();
     JLabel totalCostLabel;
+    TableModel products;
 
     private ArrayList<Purchase> cartList = new ArrayList<Purchase>();
     private int bill_id = Database.getMaxColumnValue("BillPay", "b_id") + 1;
 
     public PurchasesPanel() {
         setBackground(Color.WHITE);
-        setBounds(0, 0, 700, 700);
+        setBounds(0, 0, 1000, 700);
         setLayout(null);
 
         init();
+    }
+
+    public void loadProducts() {
+        TableModel products = Database.get("Product");
+        if(products != null) productsTable.setModel(products);
     }
 
     public void init() {
@@ -85,15 +94,35 @@ public class PurchasesPanel extends JPanel {
         JDesktopPane cartPane = getCartPen();
         add(cartPane);
 
-        JButton purchaseBtn = new JButton("Purchase");
-        purchaseBtn.setBounds(10, 590, 100, 30);
-        purchaseBtn.addActionListener(new ActionListener() {
+        JButton previewBtn = new JButton("Preview");
+        previewBtn.setBounds(10, 590, 80, 30);
+        previewBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                viewInvoice();
+            }
+        });
+        add(previewBtn);
+
+        JButton confirmBtn = new JButton("Confirm");
+        confirmBtn.setBounds(95, 590, 80, 30);
+        confirmBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 purchaseAll();
             }
         });
-        add(purchaseBtn);
+        add(confirmBtn);
+
+        JButton pdfBtn = new JButton("PDF");
+        pdfBtn.setBounds(180, 590, 80, 30);
+        pdfBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                generatePdf();
+            }
+        });
+        add(pdfBtn);
     }
 
     public JDesktopPane getCartPen() {
@@ -141,8 +170,7 @@ public class PurchasesPanel extends JPanel {
 
         productsPen.setBorder(BorderFactory.createTitledBorder("Products Table"));
 
-        TableModel products = Database.get("Product");
-        if(products != null) productsTable.setModel(products);
+        loadProducts();
 
         productsTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -153,11 +181,11 @@ public class PurchasesPanel extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(20, 20, 440, 480);
+        scrollPane.setBounds(20, 20, 640, 480);
         scrollPane.setViewportView(productsTable);
         productsPen.add(scrollPane);
 
-        productsPen.setBounds(300, 100, 470, 500);
+        productsPen.setBounds(300, 100, 670, 500);
 
         return productsPen;
     }
@@ -168,7 +196,7 @@ public class PurchasesPanel extends JPanel {
         searchKeyLabel.setBounds(350, 10, 100, 30);
         add(searchKeyLabel);
 
-        comboBox = new JComboBox<String>(new String[] {"p_id", "p_name", "p_catagory"});
+        comboBox = new JComboBox<String>(new String[] {"p_id", "p_name", "p_catagory", "barcode"});
         comboBox.setBounds(500, 10, 200, 30);
         add(comboBox);
 
@@ -228,17 +256,32 @@ public class PurchasesPanel extends JPanel {
         setVisible(true);
     }
 
+    public void viewInvoice() {
+        invoicePanel.setCartList(cartList);
+        invoicePanel.updateCartList();
+        invoicePanel.setVisible(true);
+    }
+
+    public void generatePdf() {
+
+        viewInvoice();
+        Boolean success = Util.savePdfFromComponent(invoicePanel, "F:/sample.pdf");
+        invoicePanel.setVisible(false);
+
+        if(success)
+            JOptionPane.showMessageDialog(null, "Success");
+        else JOptionPane.showMessageDialog(null, "Error");
+    }
+
     public void purchaseAll() {
 
         for (Purchase purchase: cartList)
-            if(!Database.addPurchase(purchase)) {
+            if(!Database.addPurchase(purchase) || !Database.decrementProductCount(purchase)) {
                 JOptionPane.showMessageDialog(null, "Error");
                 return;
             }
-
-        cartList.clear();
         JOptionPane.showMessageDialog(null, "Successful");
-        updateCartList();
+        loadProducts();
     }
 
 }

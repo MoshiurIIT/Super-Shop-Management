@@ -110,7 +110,7 @@ public class LoginPanel extends JFrame {
                 Boolean authenticated = Authentication.authenticate(userType,userName, password);
                 if(authenticated){
                     self.dispose();
-                    new ControlPanel();
+                    new ControlPanel(userType);
                     JOptionPane.showMessageDialog(null,"Authentication Successful");
                 }
                 else JOptionPane.showMessageDialog(null,"Try Again");

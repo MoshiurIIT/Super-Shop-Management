@@ -1,9 +1,9 @@
 package services;
 
-import models.Customer;
-import models.Product;
-import models.Purchase;
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import models.*;
 import net.proteanit.sql.DbUtils;
+import utilities.Util;
 
 import javax.swing.table.TableModel;
 import java.sql.ResultSet;
@@ -38,11 +38,78 @@ public class Database {
 
     }
 
+    public static ResultSet getIn(String tableName, String prop, String values[]) {
+        String commaSeparatedValues = String.join(",", values);
+        String query = "select * from " + tableName + " where " + prop + " in (" + commaSeparatedValues + ")";
+        ResultSet resultSet = QueryExecutor.executeQuery(query, new String[]{});
+        return resultSet;
+    }
+
+    public static Boolean addOwner(Owner owner) {
+        try {
+            String query = "insert into AdminLogin (Username, Password) values(?, ?)";
+            return QueryExecutor.execute(query, new String[]{owner.userName, owner.Password});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean updateOwner(Owner owner) {
+        try {
+            String query = "update AdminLogin set Password=? where Username=?";
+            return QueryExecutor.execute(query, new String[]{owner.Password, owner.userName});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean deleteOwner(Owner owner) {
+        try {
+            String query = "delete from AdminLogin where Username=?";
+            return QueryExecutor.execute(query, new String[]{owner.userName});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean addSalesStaff(SalesStaff salesStaff) {
+        try {
+            String query = "insert into Login (Username, Password) values(?, ?)";
+            return QueryExecutor.execute(query, new String[]{salesStaff.userName, salesStaff.Password});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean updateSalesStaff(SalesStaff salesStaff) {
+        try {
+            String query = "update Login set Password=? where Username=?";
+            return QueryExecutor.execute(query, new String[]{salesStaff.Password, salesStaff.userName});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean deleteSalesStaff(SalesStaff salesStaff) {
+        try {
+            String query = "delete from AdminLogin where Username=?";
+            return QueryExecutor.execute(query, new String[]{salesStaff.userName});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static Boolean addProduct(Product product) {
         try {
-            String query = "insert into Product (p_name, p_catagory, p_price, p_unit) values(?, ?, ?, ?)";
+            String query = "insert into Product (p_name, p_catagory, p_price, p_unit, p_count, barcode) values(?, ?, ?, ?, ?, ?)";
             return QueryExecutor.execute(query, new String[]{product.p_name, product.p_catagory,
-                    product.p_price, product.p_unit});
+                    product.p_price, product.p_unit, product.p_count, product.barcode});
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -51,9 +118,9 @@ public class Database {
 
     public static Boolean updateProduct(Product product) {
         try {
-            String query = "update Product set p_name=?, p_catagory=?, p_price=?, p_unit=? where p_id=?";
+            String query = "update Product set p_name=?, p_catagory=?, p_price=?, p_unit=?, p_count=?, barcode=? where p_id=?";
             return QueryExecutor.execute(query, new String[]{product.p_name, product.p_catagory, product.p_price,
-                    product.p_unit, product.p_id});
+                    product.p_unit, product.p_count, product.barcode, product.p_id});
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -113,6 +180,16 @@ public class Database {
         }
     }
 
+    public static Boolean decrementProductCount(Purchase purchase) {
+        try {
+            String query = "update Product set p_count = p_count - 1 where p_id=?";
+            return QueryExecutor.execute(query, new String[]{purchase.p_id});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static Boolean updatePurchase(Purchase purchase) {
         try {
             String query = "update BillPay set b_id=?, c_id=?, p_id=?, date=? where id=?";
@@ -151,19 +228,17 @@ public class Database {
 
     public static double getTotalCost(ArrayList<Purchase> purchases) {
 
-        String purchaseIds[] = new String[purchases.size()];
+        String productIds[] = new String[purchases.size()];
         int len = 0;
         for(Purchase purchase: purchases)
-            purchaseIds[len++] = purchase.p_id;
+            productIds[len++] = purchase.p_id;
 
         try {
-            String commaSeparatedIds = String.join(",", purchaseIds);
-            String query = "select * from Product where p_id in (" + commaSeparatedIds + ")";
-            ResultSet resultSet = QueryExecutor.executeQuery(query, new String[]{});
+            ResultSet resultSet = getIn("Product", "p_id", productIds);
 
             double res = 0;
             while (resultSet.next())
-                res += resultSet.getDouble("p_price");
+                res += resultSet.getDouble("p_price") * Util.countOccurrences(resultSet.getString("p_id"), productIds);
             return res;
         } catch (Exception exception) {
             return 0;
