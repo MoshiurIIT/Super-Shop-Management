@@ -194,7 +194,7 @@ public class Database {
         try {
             String query = "update BillPay set b_id=?, c_id=?, p_id=?, date=? where id=?";
             return QueryExecutor.execute(query, new String[]{purchase.b_id, purchase.c_id, purchase.p_id,
-                    purchase.date.toString(), purchase.id});
+                    new SimpleDateFormat("yyyy-MM-dd").format(purchase.date), purchase.id});
         } catch (Exception e) {
             e.printStackTrace();
             return false;

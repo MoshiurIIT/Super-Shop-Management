@@ -17,6 +17,7 @@ public class ControlPanelController implements MenuListener, ActionListener {
     CustomersPanel customersPanel = new CustomersPanel();
     OwnersPanel ownersPanel = new OwnersPanel();
     SalesStaffsPanel salesStaffsPanel = new SalesStaffsPanel();
+    SalesPanel salesPanel = new SalesPanel();
 
     public ControlPanelController(ControlPanel panel) {
         controlPanel = panel;
@@ -51,6 +52,12 @@ public class ControlPanelController implements MenuListener, ActionListener {
         controlPanel.setVisible(true);
     }
 
+    public void loadSalesPanel() {
+        salesPanel.loadPurchases();
+        controlPanel.setContentPane(salesPanel);
+        controlPanel.setVisible(true);
+    }
+
     @Override
     public void menuSelected(MenuEvent event) {
         String selectedMenu = ((JMenuItem)event.getSource()).getActionCommand();
@@ -63,6 +70,9 @@ public class ControlPanelController implements MenuListener, ActionListener {
                 break;
             case "Customers":
                 loadCustomersPanel();
+                break;
+            case "Sales":
+                loadSalesPanel();
                 break;
             default:
                 break;

@@ -78,6 +78,9 @@ public class ControlPanel extends JFrame {
         if(userRole == "Owner") {
             JMenu usersMenu = getUsersMenu();
             menubar.add(usersMenu);
+
+            JMenu salesMenu = getSalesMenu();
+            menubar.add(salesMenu);
         }
 
         JMenu helpMenu = getHelpMenu();
@@ -85,6 +88,13 @@ public class ControlPanel extends JFrame {
 
         return menubar;
 
+    }
+
+    public JMenu getSalesMenu() {
+        JMenu salesMenu = new JMenu("Sales");
+        salesMenu.addMenuListener(controlPanelController);
+
+        return salesMenu;
     }
 
     public JMenu getUsersMenu() {
@@ -123,7 +133,7 @@ public class ControlPanel extends JFrame {
         JMenuBar menubar = getMenubar();
         setJMenuBar(menubar);
 
-        controlPanelController.loadPurchasesPanel();
+        controlPanelController.loadSalesPanel();
     }
 
 }

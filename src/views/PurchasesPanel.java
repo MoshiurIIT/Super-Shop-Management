@@ -44,7 +44,7 @@ public class PurchasesPanel extends JPanel {
     }
 
     public void loadProducts() {
-        TableModel products = Database.get("Product");
+        products = Database.get("Product");
         if(products != null) productsTable.setModel(products);
     }
 
