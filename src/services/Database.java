@@ -9,7 +9,6 @@ import javax.swing.table.TableModel;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Database {
 
@@ -242,6 +241,24 @@ public class Database {
             return res;
         } catch (Exception exception) {
             return 0;
+        }
+    }
+
+    public static String updatePassword(String pasword, String newPassword) {
+        if(!Authentication.verifyAuthentication()) return "Not Authenticated";
+
+        String username = Authentication.getUsername();
+        if(!Authentication.match(pasword)) return "Permission Denied";
+        String userType = Authentication.getUserType();
+        String tableName = (userType == "Owner") ? "AdminLogin" : "Login";
+        try {
+            String query = "update " + tableName + " set Password=? where Username=?";
+            Boolean success = QueryExecutor.execute(query, new String[]{newPassword, username});
+            if(success) return "Success";
+            else return "Error";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Success";
         }
     }
 }

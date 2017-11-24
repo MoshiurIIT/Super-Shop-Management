@@ -27,6 +27,10 @@ public class ControlPanel extends JFrame {
 
         JMenu accountMenu = new JMenu("Account");
 
+        JMenuItem changePasswordItem = new JMenuItem("Change Password");
+        changePasswordItem.addActionListener(controlPanelController);
+        accountMenu.add(changePasswordItem);
+
         return accountMenu;
 
     }
@@ -133,7 +137,7 @@ public class ControlPanel extends JFrame {
         JMenuBar menubar = getMenubar();
         setJMenuBar(menubar);
 
-        controlPanelController.loadSalesPanel();
+        controlPanelController.loadProductsPanel();
     }
 
 }
