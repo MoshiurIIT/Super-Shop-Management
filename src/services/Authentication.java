@@ -50,7 +50,8 @@ public class Authentication {
     }
 
     public static String getUsername() {
-        return credential.username;
+        if(credential == null) return "Undefined";
+        else return credential.username;
     }
 
     public static Boolean match(String password) {

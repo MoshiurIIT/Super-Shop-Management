@@ -41,7 +41,7 @@ public class SalesPanel extends JPanel {
     }
 
     public void loadPurchases() {
-        TableModel purchases = Database.get("BillPay");
+        TableModel purchases = Database.getSales();
         if(purchases != null) salesTable.setModel(purchases);
     }
 
@@ -157,16 +157,16 @@ public class SalesPanel extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 int row = salesTable.getSelectedRow();
                 TableModel tableModel = salesTable.getModel();
-                String data[] = new String[5];
-                for (int i = 0; i < 5; i++) {
+                String data[] = new String[7];
+                for (int i = 0; i < 7; i++) {
                     data[i] = tableModel.getValueAt(row, i).toString();
                 }
                 textField_id.setText(data[0]);
                 textField_bid.setText(data[1]);
-                textField_cid.setText(data[2]);
-                textField_pid.setText(data[3]);
+                textField_pid.setText(data[2]);
+                textField_cid.setText(data[4]);
                 try {
-                    Date date = (new SimpleDateFormat("yyyy-MM-dd")).parse(data[4]);
+                    Date date = (new SimpleDateFormat("yyyy-MM-dd")).parse(data[6]);
 
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(date);
@@ -182,11 +182,11 @@ public class SalesPanel extends JPanel {
         });
 
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(20, 20, 440, 480);
+        scrollPane.setBounds(20, 20, 640, 480);
         scrollPane.setViewportView(salesTable);
         salesPane.add(scrollPane);
 
-        salesPane.setBounds(300, 100, 470, 500);
+        salesPane.setBounds(300, 100, 670, 500);
 
         return salesPane;
     }
@@ -197,7 +197,7 @@ public class SalesPanel extends JPanel {
         searchKeyLabel.setBounds(350, 10, 100, 30);
         add(searchKeyLabel);
 
-        comboBox = new JComboBox<String>(new String[] {"id", "b_id", "c_id", "p_id", "date"});
+        comboBox = new JComboBox<String>(new String[] {"id", "b_id", "p_id", "p_name", "c_id", "c_name", "date"});
         comboBox.setBounds(500, 10, 200, 30);
         add(comboBox);
 
@@ -219,7 +219,7 @@ public class SalesPanel extends JPanel {
                     loadPurchases();
                 }
                 else {
-                    TableModel sales = Database.get("BillPay", searchKey, searchText);
+                    TableModel sales = Database.getSales(searchKey, searchText);
                     if(sales != null) salesTable.setModel(sales);
                 }
             }

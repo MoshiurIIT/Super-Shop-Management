@@ -7,8 +7,10 @@ import utilities.Util;
 
 import javax.swing.table.TableModel;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Database {
 
@@ -35,6 +37,69 @@ public class Database {
             return null;
         }
 
+    }
+
+    public static TableModel getSales() {
+
+        try {
+            String query = "select BillPay.id, BillPay.b_id, BillPay.p_id, Product.p_name, BillPay.c_id, Customer.c_name, BillPay.date from BillPay, Customer, Product where BillPay.c_id=Customer.c_id and BillPay.p_id=Product.p_id";
+            ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{});
+            return DbUtils.resultSetToTableModel(resultSet);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static TableModel getSales(String searchKey, String searchText) {
+
+        if (Arrays.asList(new String[]{"id", "b_id", "c_id", "p_id", "date"}).contains(searchKey)) {
+            return get("BillPay", searchKey, searchText);
+        }
+
+        if (searchKey.equals("c_name")) {
+            try {
+                String q = "select * from Customer where c_name=?";
+                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{searchText});
+
+                ArrayList<String> idList = new ArrayList<String>();
+                while (resultSet.next()) {
+                    String c_id = resultSet.getString(1);
+                    idList.add(c_id);
+                }
+
+                String ids[] = idList.toArray(new String[idList.size()]);
+                String commaSeparatedValues = String.join(",", ids);
+                String query = "select BillPay.id, BillPay.b_id, BillPay.p_id, Product.p_name, BillPay.c_id, Customer.c_name, BillPay.date from BillPay, Customer, Product where BillPay.c_id=Customer.c_id and BillPay.p_id=Product.p_id and BillPay.c_id in (" + commaSeparatedValues + ")";
+                resultSet = QueryExecutor.executeQuery(query, new String[]{});
+                return DbUtils.resultSetToTableModel(resultSet);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (searchKey.equals("p_name")) {
+            try {
+                String q = "select * from Product where p_name=?";
+                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{searchText});
+
+                ArrayList<String> idList = new ArrayList<String>();
+                while (resultSet.next()) {
+                    String p_id = resultSet.getString(1);
+                    idList.add(p_id);
+                }
+
+                String ids[] = idList.toArray(new String[idList.size()]);
+                String commaSeparatedValues = String.join(",", ids);
+                String query = "select BillPay.id, BillPay.b_id, BillPay.p_id, Product.p_name, BillPay.c_id, Customer.c_name, BillPay.date from BillPay, Customer, Product where BillPay.c_id=Customer.c_id and BillPay.p_id=Product.p_id and BillPay.p_id in (" + commaSeparatedValues + ")";
+                resultSet = QueryExecutor.executeQuery(query, new String[]{});
+                return DbUtils.resultSetToTableModel(resultSet);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
     public static ResultSet getIn(String tableName, String prop, String values[]) {
