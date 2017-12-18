@@ -29,7 +29,7 @@ public class Database {
     public static TableModel get(String tableName, String searchKey, String searchText) {
 
         try {
-            String query = "select * from " + tableName + " where " + searchKey + "='" + searchText + "'";
+            String query = "select * from " + tableName + " where (lower(" + searchKey  + ") like '" + searchText + "')";
             ResultSet resultSet = QueryExecutor.executeQuery(query, new String[]{});
             return DbUtils.resultSetToTableModel(resultSet);
         } catch (Exception e) {
@@ -59,8 +59,8 @@ public class Database {
 
         if (searchKey.equals("c_name")) {
             try {
-                String q = "select * from Customer where c_name=?";
-                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{searchText});
+                String q = "select * from Customer where (lower(c_name) like '" + searchText + "')";
+                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{});
 
                 ArrayList<String> idList = new ArrayList<String>();
                 while (resultSet.next()) {
@@ -80,8 +80,8 @@ public class Database {
 
         if (searchKey.equals("p_name")) {
             try {
-                String q = "select * from Product where p_name=?";
-                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{searchText});
+                String q = "select * from Product where (lower(p_name) like '" + searchText + "')";
+                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{});
 
                 ArrayList<String> idList = new ArrayList<String>();
                 while (resultSet.next()) {
@@ -247,6 +247,28 @@ public class Database {
     public static Boolean decrementProductCount(Purchase purchase) {
         try {
             String query = "update Product set p_count = p_count - 1 where p_id=?";
+            return QueryExecutor.execute(query, new String[]{purchase.p_id});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean validateProductCount(Purchase purchase) {
+        try {
+            String query = "select * from Product where p_id=? and p_count < 0";
+            ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{purchase.p_id});
+            TableModel tm = DbUtils.resultSetToTableModel(resultSet);
+            return tm.getRowCount() == 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean incrementProductCount(Purchase purchase) {
+        try {
+            String query = "update Product set p_count = p_count + 1 where p_id=?";
             return QueryExecutor.execute(query, new String[]{purchase.p_id});
         } catch (Exception e) {
             e.printStackTrace();

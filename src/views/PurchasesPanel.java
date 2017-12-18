@@ -1,12 +1,7 @@
 package views;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import models.Purchase;
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
 import services.Database;
-import utilities.DateLabelFormatter;
 import utilities.Util;
 
 import javax.swing.*;
@@ -14,18 +9,15 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Properties;
 
 public class PurchasesPanel extends JPanel {
 
-    private JTable productsTable = new JTable();
     private JTextField textField_pid;
     private JTextField textField_cid;
-    private JDatePickerImpl jDatePicker;
-    private JComboBox comboBox;
-    private JTextField txtSearchProducts;
+    JTextField barcodeField;
     InvoicePanel invoicePanel = new InvoicePanel();
 
     private JTable cartTable = new JTable();
@@ -43,20 +35,31 @@ public class PurchasesPanel extends JPanel {
         init();
     }
 
-    public void loadProducts() {
-        products = Database.get("Product");
-        if(products != null) productsTable.setModel(products);
-    }
-
     public void init() {
 
         JDesktopPane purchasePane = getPurchasePane();
         add(purchasePane);
 
-        JDesktopPane productsPen = getProductsPen();
-        add(productsPen);
+        JDesktopPane cartsPen = getCartsPen();
+        add(cartsPen);
 
-        addSearchOption();
+        JLabel barcodelbl = new JLabel("Barcode");
+        barcodelbl.setBounds(10, 30, 120, 20);
+        add(barcodelbl);
+
+        barcodeField = new JTextField();
+        barcodeField.setBounds(120, 30, 160, 20);
+        barcodeField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent event) {
+                String barcode = barcodeField.getText();
+                TableModel tm = Database.get("Product", "barcode", barcode);
+                if(tm.getRowCount() == 0) return;
+                String p_id = tm.getValueAt(0, 0).toString();
+                textField_pid.setText(p_id);
+            }
+        });
+        add(barcodeField);
 
         textField_pid = new JTextField();
         textField_pid.setBounds(120, 127, 120, 20);
@@ -71,10 +74,6 @@ public class PurchasesPanel extends JPanel {
         properties.put("text.month", "Month");
         properties.put("text.year", "Year");
 
-        jDatePicker = new JDatePickerImpl(new JDatePanelImpl(new UtilDateModel(), properties), new DateLabelFormatter());
-        jDatePicker.setBounds(120, 193, 140, 30);
-        add(jDatePicker);
-
         JButton btnAddToCart = new JButton("Add To Cart");
         btnAddToCart.setBounds(5, 250, 100, 30);
         btnAddToCart.addActionListener(new ActionListener() {
@@ -88,14 +87,11 @@ public class PurchasesPanel extends JPanel {
         add(btnAddToCart);
 
         totalCostLabel = new JLabel();
-        totalCostLabel.setBounds(10, 550, 200, 30);
+        totalCostLabel.setBounds(300, 550, 200, 30);
         add(totalCostLabel);
 
-        JDesktopPane cartPane = getCartPen();
-        add(cartPane);
-
         JButton previewBtn = new JButton("Preview");
-        previewBtn.setBounds(10, 590, 80, 30);
+        previewBtn.setBounds(300, 590, 80, 30);
         previewBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -105,17 +101,19 @@ public class PurchasesPanel extends JPanel {
         add(previewBtn);
 
         JButton confirmBtn = new JButton("Confirm");
-        confirmBtn.setBounds(95, 590, 80, 30);
+        confirmBtn.setBounds(385, 590, 80, 30);
         confirmBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
                 purchaseAll();
+                cartList.clear();
+                updateCartList();
             }
         });
         add(confirmBtn);
 
         JButton pdfBtn = new JButton("PDF");
-        pdfBtn.setBounds(180, 590, 80, 30);
+        pdfBtn.setBounds(470, 590, 80, 30);
         pdfBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
@@ -125,29 +123,11 @@ public class PurchasesPanel extends JPanel {
         add(pdfBtn);
     }
 
-    public JDesktopPane getCartPen() {
-
-        JDesktopPane cartPane = new JDesktopPane();
-
-        cartPane.setBorder(BorderFactory.createTitledBorder("Cart Table"));
-
-        updateCartList();
-
-        JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBounds(10, 20, 275, 220);
-        scrollPane.setViewportView(cartTable);
-        cartPane.add(scrollPane);
-
-        cartPane.setBounds(5, 300, 295, 250);
-
-        return cartPane;
-    }
-
     public JDesktopPane getPurchasePane() {
 
         JDesktopPane purchasePane = new JDesktopPane();
         purchasePane.setBorder(BorderFactory.createTitledBorder("Purchase Data"));
-        purchasePane.setBounds(3, 97, 286, 150);
+        purchasePane.setBounds(3, 97, 286, 120);
 
         JLabel lblProductId = new JLabel("Product ID");
         lblProductId.setBounds(10, 25, 80, 30);
@@ -157,76 +137,23 @@ public class PurchasesPanel extends JPanel {
         lblCustomerId.setBounds(10, 55, 107, 30);
         purchasePane.add(lblCustomerId);
 
-        JLabel lblDate = new JLabel("Date");
-        lblDate.setBounds(10, 90, 107, 30);
-        purchasePane.add(lblDate);
-
         return purchasePane;
     }
 
-    public JDesktopPane getProductsPen() {
+    public JDesktopPane getCartsPen() {
 
-        JDesktopPane productsPen = new JDesktopPane();
+        JDesktopPane cartsPen = new JDesktopPane();
 
-        productsPen.setBorder(BorderFactory.createTitledBorder("Products Table"));
-
-        loadProducts();
-
-        productsTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int row = productsTable.getSelectedRow();
-                textField_pid.setText(productsTable.getModel().getValueAt(row, 0).toString());
-            }
-        });
+        cartsPen.setBorder(BorderFactory.createTitledBorder("Cart List"));
 
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBounds(20, 20, 640, 480);
-        scrollPane.setViewportView(productsTable);
-        productsPen.add(scrollPane);
+        scrollPane.setViewportView(cartTable);
+        cartsPen.add(scrollPane);
 
-        productsPen.setBounds(300, 100, 670, 500);
+        cartsPen.setBounds(300, 20, 670, 500);
 
-        return productsPen;
-    }
-
-    public void addSearchOption() {
-
-        JLabel searchKeyLabel = new JLabel("Search Key");
-        searchKeyLabel.setBounds(350, 10, 100, 30);
-        add(searchKeyLabel);
-
-        comboBox = new JComboBox<String>(new String[] {"p_id", "p_name", "p_catagory", "barcode"});
-        comboBox.setBounds(500, 10, 200, 30);
-        add(comboBox);
-
-        JLabel searchTextLabel = new JLabel("Search Text");
-        searchTextLabel.setBounds(350, 50, 100, 30);
-        add(searchTextLabel);
-
-        txtSearchProducts = new JTextField();
-        txtSearchProducts.setBounds(500, 50, 200, 30);
-        txtSearchProducts.setToolTipText("Search Products");
-
-        txtSearchProducts.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent event) {
-                String searchKey = (String) comboBox.getSelectedItem();
-                String searchText = txtSearchProducts.getText();
-
-                if(searchText.isEmpty()) {
-                    TableModel products = Database.get("Product");
-                    if(products != null) productsTable.setModel(products);
-                }
-                else {
-                    TableModel products = Database.get("Product", searchKey, searchText);
-                    if(products != null) productsTable.setModel(products);
-                }
-            }
-        });
-
-        add(txtSearchProducts);
-
+        return cartsPen;
     }
 
     public Purchase getPurchase() {
@@ -236,7 +163,7 @@ public class PurchasesPanel extends JPanel {
             purchase.b_id = Integer.toString(bill_id);
             purchase.p_id = textField_pid.getText();
             purchase.c_id = textField_cid.getText();
-            purchase.date = (new SimpleDateFormat("yyyy-MM-dd")).parse(jDatePicker.getJFormattedTextField().getText());
+            purchase.date = new Date();
         } catch (Exception exception) {
             return null;
         }
@@ -280,8 +207,15 @@ public class PurchasesPanel extends JPanel {
                 JOptionPane.showMessageDialog(null, "Error");
                 return;
             }
+        for (Purchase purchase: cartList)
+            if(!Database.validateProductCount(purchase)) {
+                JOptionPane.showMessageDialog(null, "Product with id " + purchase.p_id + " is not available.");
+                for(Purchase purchase1: cartList) {
+                    Database.incrementProductCount(purchase1);
+                }
+                return;
+            }
         JOptionPane.showMessageDialog(null, "Successful");
-        loadProducts();
     }
 
 }

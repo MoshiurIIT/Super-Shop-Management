@@ -7,6 +7,7 @@ import org.jdatepicker.impl.JDatePickerImpl;
 import org.jdatepicker.impl.UtilDateModel;
 import services.Database;
 import utilities.DateLabelFormatter;
+import utilities.Util;
 
 import javax.swing.*;
 import javax.swing.table.TableModel;
@@ -26,6 +27,7 @@ public class SalesPanel extends JPanel {
     private JTextField textField_cid;
     private JTextField textField_pid;
     private JDatePickerImpl jDatePicker;
+    JScrollPane scrollPane;
 
     private JComboBox comboBox;
     private JTextField txtSearchSales;
@@ -113,6 +115,16 @@ public class SalesPanel extends JPanel {
             }
         });
         add(btnDeleteCustomer);
+
+        JButton btnPDF = new JButton("PDF");
+        btnPDF.setBounds(170, 538, 80, 44);
+        btnPDF.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                generatePDF();
+            }
+        });
+        add(btnPDF);
     }
 
     public JDesktopPane getSalePane() {
@@ -181,7 +193,7 @@ public class SalesPanel extends JPanel {
             }
         });
 
-        JScrollPane scrollPane = new JScrollPane();
+        scrollPane = new JScrollPane();
         scrollPane.setBounds(20, 20, 640, 480);
         scrollPane.setViewportView(salesTable);
         salesPane.add(scrollPane);
@@ -243,6 +255,14 @@ public class SalesPanel extends JPanel {
         }
 
         return purchase;
+    }
+
+    public void generatePDF() {
+        Boolean success = Util.savePdfFromComponent(scrollPane, "F:/sample.pdf");
+
+        if(success)
+            JOptionPane.showMessageDialog(null, "Success");
+        else JOptionPane.showMessageDialog(null, "Error");
     }
 
 }

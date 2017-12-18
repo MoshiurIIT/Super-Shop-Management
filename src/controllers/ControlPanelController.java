@@ -31,7 +31,6 @@ public class ControlPanelController implements MenuListener, ActionListener {
     }
 
     public void loadPurchasesPanel() {
-        purchasesPanel.loadProducts();
         controlPanel.setContentPane(purchasesPanel);
         controlPanel.setVisible(true);
     }

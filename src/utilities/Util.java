@@ -30,8 +30,8 @@ public class Util {
             d.open();
 
             Image iTextImage = Image.getInstance(writer, image, 1);
-            iTextImage.setAbsolutePosition(50, 50);
-            iTextImage.scalePercent(100);
+            iTextImage.setAbsolutePosition(80, 50);
+            iTextImage.scalePercent(80);
             d.add(iTextImage);
 
             d.close();

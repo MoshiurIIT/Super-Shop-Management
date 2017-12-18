@@ -13,7 +13,7 @@ public class ControlPanel extends JFrame {
     private ControlPanelController controlPanelController = new ControlPanelController(self);
 
     public ControlPanel(String _role) {
-        super("Control Panel");
+        super("Super Shop");
         userRole = _role;
 
         init();
@@ -137,7 +137,7 @@ public class ControlPanel extends JFrame {
         JMenuBar menubar = getMenubar();
         setJMenuBar(menubar);
 
-        controlPanelController.loadProductsPanel();
+        controlPanelController.loadPurchasesPanel();
     }
 
 }
