@@ -51,12 +51,11 @@ public class InvoicePanel extends JFrame {
 
     public void setCartList(ArrayList<Purchase> _cartList) {
         cartList = _cartList;
-
-        TableModel tableModel = Database.get("Customer", "c_id", cartList.get(0).c_id);
-        customerNamelbl.setText("Customer Name: " + tableModel.getValueAt(0, 1).toString());
-
+        if(!cartList.get(0).c_id.equals("")) {
+            TableModel tableModel = Database.get("Customer", "c_id", cartList.get(0).c_id);
+            customerNamelbl.setText("Customer Name: " + tableModel.getValueAt(0, 1).toString());
+        }
         billIdlbl.setText("Bill Id: " + cartList.get(0).b_id);
-
         purchaseDatelbl.setText("Purchase Date: " + new SimpleDateFormat("yyyy-MM-dd").format(cartList.get(0).date));
     }
 

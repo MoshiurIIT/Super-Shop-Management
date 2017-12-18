@@ -13,7 +13,7 @@ public class ControlPanel extends JFrame {
     private ControlPanelController controlPanelController = new ControlPanelController(self);
 
     public ControlPanel(String _role) {
-        super("Control Panel");
+        super("Super Shop");
         userRole = _role;
 
         init();
@@ -26,6 +26,10 @@ public class ControlPanel extends JFrame {
     public JMenu getAccountMenu() {
 
         JMenu accountMenu = new JMenu("Account");
+
+        JMenuItem changePasswordItem = new JMenuItem("Change Password");
+        changePasswordItem.addActionListener(controlPanelController);
+        accountMenu.add(changePasswordItem);
 
         return accountMenu;
 
@@ -78,6 +82,9 @@ public class ControlPanel extends JFrame {
         if(userRole == "Owner") {
             JMenu usersMenu = getUsersMenu();
             menubar.add(usersMenu);
+
+            JMenu salesMenu = getSalesMenu();
+            menubar.add(salesMenu);
         }
 
         JMenu helpMenu = getHelpMenu();
@@ -85,6 +92,13 @@ public class ControlPanel extends JFrame {
 
         return menubar;
 
+    }
+
+    public JMenu getSalesMenu() {
+        JMenu salesMenu = new JMenu("Sales");
+        salesMenu.addMenuListener(controlPanelController);
+
+        return salesMenu;
     }
 
     public JMenu getUsersMenu() {

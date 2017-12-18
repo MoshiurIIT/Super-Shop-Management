@@ -7,9 +7,10 @@ import utilities.Util;
 
 import javax.swing.table.TableModel;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 
 public class Database {
 
@@ -28,7 +29,7 @@ public class Database {
     public static TableModel get(String tableName, String searchKey, String searchText) {
 
         try {
-            String query = "select * from " + tableName + " where " + searchKey + "='" + searchText + "'";
+            String query = "select * from " + tableName + " where (lower(" + searchKey  + ") like '" + searchText + "')";
             ResultSet resultSet = QueryExecutor.executeQuery(query, new String[]{});
             return DbUtils.resultSetToTableModel(resultSet);
         } catch (Exception e) {
@@ -36,6 +37,69 @@ public class Database {
             return null;
         }
 
+    }
+
+    public static TableModel getSales() {
+
+        try {
+            String query = "select BillPay.id, BillPay.b_id, BillPay.p_id, Product.p_name, BillPay.c_id, Customer.c_name, BillPay.date from BillPay, Customer, Product where BillPay.c_id=Customer.c_id and BillPay.p_id=Product.p_id";
+            ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{});
+            return DbUtils.resultSetToTableModel(resultSet);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static TableModel getSales(String searchKey, String searchText) {
+
+        if (Arrays.asList(new String[]{"id", "b_id", "c_id", "p_id", "date"}).contains(searchKey)) {
+            return get("BillPay", searchKey, searchText);
+        }
+
+        if (searchKey.equals("c_name")) {
+            try {
+                String q = "select * from Customer where (lower(c_name) like '" + searchText + "')";
+                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{});
+
+                ArrayList<String> idList = new ArrayList<String>();
+                while (resultSet.next()) {
+                    String c_id = resultSet.getString(1);
+                    idList.add(c_id);
+                }
+
+                String ids[] = idList.toArray(new String[idList.size()]);
+                String commaSeparatedValues = String.join(",", ids);
+                String query = "select BillPay.id, BillPay.b_id, BillPay.p_id, Product.p_name, BillPay.c_id, Customer.c_name, BillPay.date from BillPay, Customer, Product where BillPay.c_id=Customer.c_id and BillPay.p_id=Product.p_id and BillPay.c_id in (" + commaSeparatedValues + ")";
+                resultSet = QueryExecutor.executeQuery(query, new String[]{});
+                return DbUtils.resultSetToTableModel(resultSet);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (searchKey.equals("p_name")) {
+            try {
+                String q = "select * from Product where (lower(p_name) like '" + searchText + "')";
+                ResultSet resultSet = QueryExecutor.executeQuery(q, new String[]{});
+
+                ArrayList<String> idList = new ArrayList<String>();
+                while (resultSet.next()) {
+                    String p_id = resultSet.getString(1);
+                    idList.add(p_id);
+                }
+
+                String ids[] = idList.toArray(new String[idList.size()]);
+                String commaSeparatedValues = String.join(",", ids);
+                String query = "select BillPay.id, BillPay.b_id, BillPay.p_id, Product.p_name, BillPay.c_id, Customer.c_name, BillPay.date from BillPay, Customer, Product where BillPay.c_id=Customer.c_id and BillPay.p_id=Product.p_id and BillPay.p_id in (" + commaSeparatedValues + ")";
+                resultSet = QueryExecutor.executeQuery(query, new String[]{});
+                return DbUtils.resultSetToTableModel(resultSet);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
     public static ResultSet getIn(String tableName, String prop, String values[]) {
@@ -190,11 +254,33 @@ public class Database {
         }
     }
 
+    public static Boolean validateProductCount(Purchase purchase) {
+        try {
+            String query = "select * from Product where p_id=? and p_count < 0";
+            ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{purchase.p_id});
+            TableModel tm = DbUtils.resultSetToTableModel(resultSet);
+            return tm.getRowCount() == 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static Boolean incrementProductCount(Purchase purchase) {
+        try {
+            String query = "update Product set p_count = p_count + 1 where p_id=?";
+            return QueryExecutor.execute(query, new String[]{purchase.p_id});
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static Boolean updatePurchase(Purchase purchase) {
         try {
             String query = "update BillPay set b_id=?, c_id=?, p_id=?, date=? where id=?";
             return QueryExecutor.execute(query, new String[]{purchase.b_id, purchase.c_id, purchase.p_id,
-                    purchase.date.toString(), purchase.id});
+                    new SimpleDateFormat("yyyy-MM-dd").format(purchase.date), purchase.id});
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -242,6 +328,24 @@ public class Database {
             return res;
         } catch (Exception exception) {
             return 0;
+        }
+    }
+
+    public static String updatePassword(String pasword, String newPassword) {
+        if(!Authentication.verifyAuthentication()) return "Not Authenticated";
+
+        String username = Authentication.getUsername();
+        if(!Authentication.match(pasword)) return "Permission Denied";
+        String userType = Authentication.getUserType();
+        String tableName = (userType == "Owner") ? "AdminLogin" : "Login";
+        try {
+            String query = "update " + tableName + " set Password=? where Username=?";
+            Boolean success = QueryExecutor.execute(query, new String[]{newPassword, username});
+            if(success) return "Success";
+            else return "Error";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Success";
         }
     }
 }
