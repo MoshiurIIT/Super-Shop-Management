@@ -4,6 +4,7 @@ import models.Product;
 import services.Database;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -22,6 +23,7 @@ public class ProductsPanel extends JPanel {
     private JComboBox comboBox;
     private JTextField txtSearchProducts;
     TableModel products;
+    Object[] headers = {"Product ID" , "Name" , "Category" , "Price(TK)" , "Unit" ,  "Count(s)" , "Barcode"};
 
     public ProductsPanel() {
         setBackground(Color.WHITE);
@@ -32,7 +34,9 @@ public class ProductsPanel extends JPanel {
     }
 
     public void loadProducts() {
-        TableModel products = Database.get("Product");
+        DefaultTableModel products = (DefaultTableModel) Database.get("Product");
+        products.setColumnIdentifiers(headers);
+
         if(products != null) productsTable.setModel(products);
     }
 
@@ -84,7 +88,8 @@ public class ProductsPanel extends JPanel {
                 Boolean isAdded = Database.addProduct(product);
                 if(isAdded){
                     JOptionPane.showMessageDialog(null, "Data Added");
-                    TableModel products = Database.get("Product");
+                    DefaultTableModel products = (DefaultTableModel) Database.get("Product");
+                    products.setColumnIdentifiers(headers);
                     if(products != null) productsTable.setModel(products);
                 }
                 else JOptionPane.showMessageDialog(null, "Error");
@@ -102,7 +107,8 @@ public class ProductsPanel extends JPanel {
                 Boolean isAdded = Database.updateProduct(product);
                 if(isAdded){
                     JOptionPane.showMessageDialog(null, "Data Updated");
-                    TableModel products = Database.get("Product");
+                    DefaultTableModel products = (DefaultTableModel) Database.get("Product");
+                    products.setColumnIdentifiers(headers);
                     if(products != null) productsTable.setModel(products);
                 }
                 else JOptionPane.showMessageDialog(null, "Error");
@@ -120,7 +126,8 @@ public class ProductsPanel extends JPanel {
                 Boolean isAdded = Database.deleteProduct(product);
                 if(isAdded){
                     JOptionPane.showMessageDialog(null, "Data Deleted");
-                    TableModel products = Database.get("Product");
+                    DefaultTableModel products = (DefaultTableModel) Database.get("Product");
+                    products.setColumnIdentifiers(headers);
                     if(products != null) productsTable.setModel(products);
                 }
                 else JOptionPane.showMessageDialog(null, "Error");
@@ -228,11 +235,13 @@ public class ProductsPanel extends JPanel {
                 String searchText = txtSearchProducts.getText();
 
                 if(searchText.isEmpty()) {
-                    TableModel products = Database.get("Product");
+                    DefaultTableModel products = (DefaultTableModel) Database.get("Product");
+                    products.setColumnIdentifiers(headers);
                     if(products != null) productsTable.setModel(products);
                 }
                 else {
-                    TableModel products = Database.get("Product", searchKey, searchText);
+                    DefaultTableModel products = (DefaultTableModel) Database.get("Product", searchKey, searchText);
+                    products.setColumnIdentifiers(headers);
                     if(products != null) productsTable.setModel(products);
                 }
             }

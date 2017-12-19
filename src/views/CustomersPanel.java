@@ -5,6 +5,7 @@ import models.Product;
 import services.Database;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -18,6 +19,8 @@ public class CustomersPanel extends JPanel {
     private JTextField textField_address;
     private JComboBox comboBox;
     private JTextField txtSearchCustomers;
+
+    Object [] headers = {"Customer ID" , "Name" , "Contact" , "Address"};
 
     public CustomersPanel() {
         setBackground(Color.WHITE);
@@ -63,7 +66,8 @@ public class CustomersPanel extends JPanel {
                 Boolean isAdded = Database.addCustomer(customer);
                 if(isAdded){
                     JOptionPane.showMessageDialog(null, "Data Added");
-                    TableModel customers = Database.get("Customer");
+                    DefaultTableModel customers = (DefaultTableModel) Database.get("Customer");
+                    customers.setColumnIdentifiers(headers);
                     if(customers != null) customersTable.setModel(customers);
                 }
                 else JOptionPane.showMessageDialog(null, "Error");
@@ -81,7 +85,8 @@ public class CustomersPanel extends JPanel {
                 Boolean isAdded = Database.updateCustomer(customer);
                 if(isAdded){
                     JOptionPane.showMessageDialog(null, "Data Updated");
-                    TableModel customers = Database.get("Customer");
+                    DefaultTableModel customers = (DefaultTableModel) Database.get("Customer");
+                    customers.setColumnIdentifiers(headers);
                     if(customers != null) customersTable.setModel(customers);
                 }
                 else JOptionPane.showMessageDialog(null, "Error");
@@ -99,7 +104,8 @@ public class CustomersPanel extends JPanel {
                 Boolean isAdded = Database.deleteCustomer(customer);
                 if(isAdded){
                     JOptionPane.showMessageDialog(null, "Data Deleted");
-                    TableModel customers = Database.get("Customer");
+                    DefaultTableModel customers = (DefaultTableModel) Database.get("Customer");
+                    customers.setColumnIdentifiers(headers);
                     if(customers != null) customersTable.setModel(customers);
                 }
                 else JOptionPane.showMessageDialog(null, "Error");
@@ -139,7 +145,8 @@ public class CustomersPanel extends JPanel {
 
         customersPane.setBorder(BorderFactory.createTitledBorder("Customers Table"));
 
-        TableModel customers = Database.get("Customer");
+        DefaultTableModel customers = (DefaultTableModel) Database.get("Customer");
+        customers.setColumnIdentifiers(headers);
         if(customers != null) customersTable.setModel(customers);
 
         customersTable.addMouseListener(new MouseAdapter() {

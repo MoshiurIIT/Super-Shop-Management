@@ -10,6 +10,7 @@ import utilities.DateLabelFormatter;
 import utilities.Util;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
@@ -34,6 +35,8 @@ public class SalesPanel extends JPanel {
 
     TableModel purchases;
 
+    Object [] headers = {"ID" , "Bill ID" , "Product ID" , "Name" , "Customer ID", "Name" , "Date"};
+
     public SalesPanel() {
         setBackground(Color.WHITE);
         setBounds(0, 0, 700, 700);
@@ -43,7 +46,8 @@ public class SalesPanel extends JPanel {
     }
 
     public void loadPurchases() {
-        TableModel purchases = Database.getSales();
+        DefaultTableModel purchases = (DefaultTableModel) Database.getSales();
+        purchases.setColumnIdentifiers(headers);
         if(purchases != null) salesTable.setModel(purchases);
     }
 
@@ -231,7 +235,8 @@ public class SalesPanel extends JPanel {
                     loadPurchases();
                 }
                 else {
-                    TableModel sales = Database.getSales(searchKey, searchText);
+                    DefaultTableModel sales = (DefaultTableModel) Database.getSales(searchKey, searchText);
+                    sales.setColumnIdentifiers(headers);
                     if(sales != null) salesTable.setModel(sales);
                 }
             }

@@ -172,7 +172,7 @@ public class PurchasesPanel extends JPanel {
     }
 
     public void updateCartList() {
-        String col[] = {"b_id","c_id","p_id", "date"};
+        String col[] = {"Bill ID","Customer ID","Product ID", "Date"};
         DefaultTableModel tableModel = new DefaultTableModel(col, 0);
 
         for (Purchase purchase: cartList)
