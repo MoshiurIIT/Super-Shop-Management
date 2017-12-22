@@ -20,6 +20,9 @@ public class ControlPanelController implements MenuListener, ActionListener {
     SalesPanel salesPanel = new SalesPanel();
     ChangePasswordPanel changePasswordPanel = new ChangePasswordPanel();
 
+    UserManualPanel userManualPanel = new UserManualPanel();
+
+
     public ControlPanelController(ControlPanel panel) {
         controlPanel = panel;
     }
@@ -61,6 +64,11 @@ public class ControlPanelController implements MenuListener, ActionListener {
     public void loadChangePasswordPanel() {
         controlPanel.setContentPane(changePasswordPanel);
         controlPanel.setVisible(true);
+    }
+
+    public void loadUserManualPanel(){
+        controlPanel.setVisible(true);
+        controlPanel.setContentPane(userManualPanel);
     }
 
     @Override
@@ -108,6 +116,9 @@ public class ControlPanelController implements MenuListener, ActionListener {
                 break;
             case "Change Password":
                 loadChangePasswordPanel();
+                break;
+            case "Manual":
+                loadUserManualPanel();
                 break;
             default:
                 break;

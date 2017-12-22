@@ -37,7 +37,7 @@ public class Util {
             d.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
+           // e.printStackTrace();
         }
         return true;
     }

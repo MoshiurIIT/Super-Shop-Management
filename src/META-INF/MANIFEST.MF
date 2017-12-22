@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: rs2xml.jar sqlite-jdbc-3.8.11.2.jar itextpdf-5.1.0.jar jda
+ tepicker-1.3.4 (1).jar
+Main-Class: Main
+

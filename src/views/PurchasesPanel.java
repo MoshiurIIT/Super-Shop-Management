@@ -179,7 +179,7 @@ public class PurchasesPanel extends JPanel {
             tableModel.addRow(purchase.toArray());
         cartTable.setModel(tableModel);
 
-        totalCostLabel.setText("Total Cost = " + Database.getTotalCost(cartList));
+        totalCostLabel.setText("Total Cost = " + Database.getTotalCost(cartList)+" TK");
         setVisible(true);
     }
 
@@ -192,7 +192,7 @@ public class PurchasesPanel extends JPanel {
     public void generatePdf() {
 
         viewInvoice();
-        Boolean success = Util.savePdfFromComponent(invoicePanel, "F:/sample.pdf");
+        Boolean success = Util.savePdfFromComponent(invoicePanel, "assets\\OutputReport\\Invoice.pdf");
         invoicePanel.setVisible(false);
 
         if(success)

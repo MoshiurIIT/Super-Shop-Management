@@ -21,7 +21,7 @@ public class Database {
             ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{});
             return DbUtils.resultSetToTableModel(resultSet);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
     }
@@ -33,7 +33,7 @@ public class Database {
             ResultSet resultSet = QueryExecutor.executeQuery(query, new String[]{});
             return DbUtils.resultSetToTableModel(resultSet);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
 
@@ -46,7 +46,7 @@ public class Database {
             ResultSet resultSet = QueryExecutor.executeQuery(query,  new String[]{});
             return DbUtils.resultSetToTableModel(resultSet);
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
     }
@@ -74,7 +74,7 @@ public class Database {
                 resultSet = QueryExecutor.executeQuery(query, new String[]{});
                 return DbUtils.resultSetToTableModel(resultSet);
             } catch (SQLException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
 
@@ -95,7 +95,7 @@ public class Database {
                 resultSet = QueryExecutor.executeQuery(query, new String[]{});
                 return DbUtils.resultSetToTableModel(resultSet);
             } catch (SQLException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
 
@@ -114,7 +114,7 @@ public class Database {
             String query = "insert into AdminLogin (Username, Password) values(?, ?)";
             return QueryExecutor.execute(query, new String[]{owner.userName, owner.Password});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -124,7 +124,7 @@ public class Database {
             String query = "update AdminLogin set Password=? where Username=?";
             return QueryExecutor.execute(query, new String[]{owner.Password, owner.userName});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -134,7 +134,7 @@ public class Database {
             String query = "delete from AdminLogin where Username=?";
             return QueryExecutor.execute(query, new String[]{owner.userName});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -144,7 +144,7 @@ public class Database {
             String query = "insert into Login (Username, Password) values(?, ?)";
             return QueryExecutor.execute(query, new String[]{salesStaff.userName, salesStaff.Password});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -154,17 +154,17 @@ public class Database {
             String query = "update Login set Password=? where Username=?";
             return QueryExecutor.execute(query, new String[]{salesStaff.Password, salesStaff.userName});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
 
     public static Boolean deleteSalesStaff(SalesStaff salesStaff) {
         try {
-            String query = "delete from AdminLogin where Username=?";
+            String query = "delete from Login where Username=?";
             return QueryExecutor.execute(query, new String[]{salesStaff.userName});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -175,7 +175,7 @@ public class Database {
             return QueryExecutor.execute(query, new String[]{product.p_name, product.p_catagory,
                     product.p_price, product.p_unit, product.p_count, product.barcode});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -186,7 +186,7 @@ public class Database {
             return QueryExecutor.execute(query, new String[]{product.p_name, product.p_catagory, product.p_price,
                     product.p_unit, product.p_count, product.barcode, product.p_id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -196,7 +196,7 @@ public class Database {
             String query = "delete from Product where p_id=?";
             return QueryExecutor.execute(query, new String[]{product.p_id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -207,7 +207,7 @@ public class Database {
             return QueryExecutor.execute(query, new String[]{customer.c_name, customer.c_contact,
                     customer.c_address});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -218,7 +218,7 @@ public class Database {
             return QueryExecutor.execute(query, new String[]{customer.c_name, customer.c_contact, customer.c_address,
                     customer.c_id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -228,7 +228,7 @@ public class Database {
             String query = "delete from Customer where c_id=?";
             return QueryExecutor.execute(query, new String[]{customer.c_id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -239,7 +239,7 @@ public class Database {
             return QueryExecutor.execute(query, new String[]{purchase.b_id, purchase.c_id,
                     purchase.p_id, new SimpleDateFormat("yyyy-MM-dd").format(purchase.date)});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -249,7 +249,7 @@ public class Database {
             String query = "update Product set p_count = p_count - 1 where p_id=?";
             return QueryExecutor.execute(query, new String[]{purchase.p_id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -261,7 +261,7 @@ public class Database {
             TableModel tm = DbUtils.resultSetToTableModel(resultSet);
             return tm.getRowCount() == 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -271,7 +271,7 @@ public class Database {
             String query = "update Product set p_count = p_count + 1 where p_id=?";
             return QueryExecutor.execute(query, new String[]{purchase.p_id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -282,7 +282,7 @@ public class Database {
             return QueryExecutor.execute(query, new String[]{purchase.b_id, purchase.c_id, purchase.p_id,
                     new SimpleDateFormat("yyyy-MM-dd").format(purchase.date), purchase.id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -292,7 +292,7 @@ public class Database {
             String query = "delete from BillPay where id=?";
             return QueryExecutor.execute(query, new String[]{purchase.id});
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -307,7 +307,7 @@ public class Database {
             }
             return res;
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return -1;
         }
     }
@@ -344,7 +344,7 @@ public class Database {
             if(success) return "Success";
             else return "Error";
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return "Success";
         }
     }

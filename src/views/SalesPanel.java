@@ -35,7 +35,7 @@ public class SalesPanel extends JPanel {
 
     TableModel purchases;
 
-    Object [] headers = {"ID" , "Bill ID" , "Product ID" , "Name" , "Customer ID", "Name" , "Date"};
+    Object [] headers = {"ID" , "Bill ID" , "Product ID" , "Product Name" , "Customer ID", "Name" , "Date"};
 
     public SalesPanel() {
         setBackground(Color.WHITE);
@@ -235,8 +235,7 @@ public class SalesPanel extends JPanel {
                     loadPurchases();
                 }
                 else {
-                    DefaultTableModel sales = (DefaultTableModel) Database.getSales(searchKey, searchText);
-                    sales.setColumnIdentifiers(headers);
+                    TableModel sales =  Database.getSales(searchKey, searchText);
                     if(sales != null) salesTable.setModel(sales);
                 }
             }
@@ -263,7 +262,7 @@ public class SalesPanel extends JPanel {
     }
 
     public void generatePDF() {
-        Boolean success = Util.savePdfFromComponent(scrollPane, "F:/sample.pdf");
+        Boolean success = Util.savePdfFromComponent(scrollPane, "assets\\OutputReport\\sales.pdf");
 
         if(success)
             JOptionPane.showMessageDialog(null, "Success");

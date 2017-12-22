@@ -28,7 +28,7 @@ public class QueryExecutor {
             System.out.println("Connection Successful");
             return true;
         }catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }
@@ -47,7 +47,7 @@ public class QueryExecutor {
             ResultSet resultSet = preparedStatement.executeQuery();
             return resultSet;
         } catch (Exception exception) {
-            exception.printStackTrace();
+            //exception.printStackTrace();
             return null;
         }
     }
@@ -66,7 +66,7 @@ public class QueryExecutor {
             preparedStatement.execute();
             return true;
         } catch (Exception exception) {
-            exception.printStackTrace();
+            //exception.printStackTrace();
             return false;
         }
     }

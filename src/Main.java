@@ -6,9 +6,9 @@ public class Main {
 
     public static void main(String[] args) {
 
-        //LoginPanel loginPanel = new LoginPanel();
+        LoginPanel loginPanel = new LoginPanel();
 
-        new ControlPanel("Owner");
+        //new ControlPanel("Owner");
     }
 
 }

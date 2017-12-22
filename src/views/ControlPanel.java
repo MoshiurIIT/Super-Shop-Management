@@ -49,6 +49,7 @@ public class ControlPanel extends JFrame {
         JMenu helpMenu = new JMenu("Help");
 
         JMenuItem manualHelpMenuItem = getManualHelpMenuItem();
+        manualHelpMenuItem.addActionListener(controlPanelController);
         helpMenu.add(manualHelpMenuItem);
 
         return helpMenu;
